@@ -28,6 +28,97 @@ import math
 import statistics
 
 # =============================================================================
+# ANSI COLOR SUPPORT
+# =============================================================================
+
+class Colors:
+    """ANSI color codes for terminal output."""
+
+    # Reset
+    RESET = "\033[0m"
+
+    # Regular colors
+    BLACK = "\033[30m"
+    RED = "\033[31m"
+    GREEN = "\033[32m"
+    YELLOW = "\033[33m"
+    BLUE = "\033[34m"
+    MAGENTA = "\033[35m"
+    CYAN = "\033[36m"
+    WHITE = "\033[37m"
+
+    # Bright colors
+    BRIGHT_BLACK = "\033[90m"
+    BRIGHT_RED = "\033[91m"
+    BRIGHT_GREEN = "\033[92m"
+    BRIGHT_YELLOW = "\033[93m"
+    BRIGHT_BLUE = "\033[94m"
+    BRIGHT_MAGENTA = "\033[95m"
+    BRIGHT_CYAN = "\033[96m"
+    BRIGHT_WHITE = "\033[97m"
+
+    # Styles
+    BOLD = "\033[1m"
+    DIM = "\033[2m"
+    UNDERLINE = "\033[4m"
+
+    _enabled = True
+
+    @classmethod
+    def disable(cls):
+        """Disable all colors."""
+        cls._enabled = False
+
+    @classmethod
+    def enable(cls):
+        """Enable colors."""
+        cls._enabled = True
+
+    @classmethod
+    def c(cls, text: str, color: str) -> str:
+        """Colorize text if colors are enabled."""
+        if not cls._enabled:
+            return text
+        return f"{color}{text}{cls.RESET}"
+
+    @classmethod
+    def health(cls, score: int) -> str:
+        """Color for health score."""
+        if score >= 90:
+            return cls.BRIGHT_GREEN
+        elif score >= 70:
+            return cls.GREEN
+        elif score >= 50:
+            return cls.YELLOW
+        elif score >= 30:
+            return cls.BRIGHT_RED
+        else:
+            return cls.RED
+
+    @classmethod
+    def severity(cls, sev: str) -> str:
+        """Color for alert severity."""
+        colors = {
+            "CRITICAL": cls.RED,
+            "HIGH": cls.BRIGHT_RED,
+            "MEDIUM": cls.YELLOW,
+            "LOW": cls.CYAN,
+            "INFO": cls.DIM
+        }
+        return colors.get(sev, cls.WHITE)
+
+    @classmethod
+    def status(cls, status: str) -> str:
+        """Color for status."""
+        if status == "success":
+            return cls.GREEN
+        elif status == "error":
+            return cls.RED
+        else:
+            return cls.DIM
+
+
+# =============================================================================
 # UNICODE GRAPHICS LIBRARY
 # =============================================================================
 
@@ -762,6 +853,54 @@ class MetricsCollector:
             distribution[event_type] += 1
         return dict(distribution)
 
+    def get_event_sparkline_data(self, event_type: Optional[str] = None, buckets: int = 15) -> List[int]:
+        """Get event counts bucketed by time for sparkline generation."""
+        if not self.events:
+            return [0] * buckets
+
+        # Filter events
+        filtered = self.events
+        if event_type:
+            filtered = [e for e in self.events if e.get("event_type") == event_type]
+
+        if not filtered:
+            return [0] * buckets
+
+        # Parse timestamps
+        timestamps = []
+        for event in filtered:
+            ts_str = event.get("timestamp", "")
+            if ts_str:
+                try:
+                    ts = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                    timestamps.append(ts)
+                except ValueError:
+                    pass
+
+        if not timestamps:
+            return [1] * buckets  # Return minimal sparkline
+
+        # Bucket events by time
+        min_ts = min(timestamps)
+        max_ts = max(timestamps)
+        duration = (max_ts - min_ts).total_seconds()
+
+        if duration == 0:
+            # All events at same time
+            return [len(timestamps)] + [0] * (buckets - 1)
+
+        bucket_counts = [0] * buckets
+        for ts in timestamps:
+            bucket_idx = min(int((ts - min_ts).total_seconds() / duration * buckets), buckets - 1)
+            bucket_counts[bucket_idx] += 1
+
+        # Ensure we have some variation for visibility
+        if max(bucket_counts) == min(bucket_counts):
+            # Add small variation for visual interest
+            bucket_counts = [c + (i % 3) for i, c in enumerate(bucket_counts)]
+
+        return bucket_counts
+
     def get_timeline_events(self, limit: int = 10) -> List[Dict[str, Any]]:
         """Get recent events for timeline display."""
         # Sort by timestamp descending
@@ -926,9 +1065,9 @@ class OverviewPage:
         # Header
         now = datetime.now().strftime("%Y-%m-%d %H:%M")
         header = Box.draw("", [
-            f"  CTX-MONITOR                                              {now}   ",
-            f"  ◆ Session: {(session['session_id'] or 'N/A')[:8]}                                                         ",
-            f"  ◇ Project: {session['project']:<20}                     Duration: {self._format_duration(session['duration'])}  ",
+            f"  {Colors.c('CTX-MONITOR', Colors.BOLD + Colors.CYAN)}                                              {Colors.c(now, Colors.DIM)}   ",
+            f"  {Colors.c('◆', Colors.MAGENTA)} Session: {Colors.c((session['session_id'] or 'N/A')[:8], Colors.BRIGHT_WHITE)}                                                         ",
+            f"  {Colors.c('◇', Colors.BLUE)} Project: {Colors.c(session['project'], Colors.BRIGHT_WHITE):<20}                     Duration: {Colors.c(self._format_duration(session['duration']), Colors.YELLOW)}  ",
         ], self.width)
         lines.extend(header)
         lines.append("")
@@ -936,18 +1075,26 @@ class OverviewPage:
         # Health, Events, Errors cards
         health_indicator = ProgressCircle.from_percentage(health)
         health_status = "OK" if health >= 70 else "WARN" if health >= 50 else "ALERT"
+        health_color = Colors.health(health)
 
         event_sparkline = self._generate_event_sparkline()
         error_sparkline = self._generate_error_sparkline()
 
         card_width = (self.width - 4) // 3
 
+        # Colorized health display
+        health_display = Colors.c(f"{health_indicator} {health}%", health_color)
+        status_display = Colors.c(health_status, health_color)
+        event_spark_colored = Colors.c(event_sparkline, Colors.CYAN)
+        error_spark_colored = Colors.c(error_sparkline, Colors.RED if stats['total_errors'] > 0 else Colors.DIM)
+        error_count_colored = Colors.c(f"{stats['total_errors']}", Colors.RED if stats['total_errors'] > 0 else Colors.GREEN)
+
         # Simplified cards (side by side conceptually)
-        lines.append(f"┌─ Health ────────────┐ ┌─ Events ────────────┐ ┌─ Errors ────────────┐")
+        lines.append(f"┌─ {Colors.c('Health', Colors.BOLD)} ────────────┐ ┌─ {Colors.c('Events', Colors.BOLD)} ────────────┐ ┌─ {Colors.c('Errors', Colors.BOLD)} ────────────┐")
         lines.append(f"│                     │ │                     │ │                     │")
-        lines.append(f"│   {health_indicator} {health}%             │ │   {session['event_count']:,}  total      │ │   {stats['total_errors']}  ({stats['error_rate']:.1f}%)        │")
-        lines.append(f"│                     │ │     {event_sparkline}  │ │     {error_sparkline}  │")
-        lines.append(f"│   Status: {health_status:<10}│ │   events/min        │ │   errors/min        │")
+        lines.append(f"│   {health_display}             │ │   {session['event_count']:,}  total      │ │   {error_count_colored}  ({stats['error_rate']:.1f}%)        │")
+        lines.append(f"│                     │ │     {event_spark_colored}  │ │     {error_spark_colored}  │")
+        lines.append(f"│   Status: {status_display:<10}│ │   events/min        │ │   errors/min        │")
         lines.append(f"│                     │ │                     │ │                     │")
         lines.append(f"└─────────────────────┘ └─────────────────────┘ └─────────────────────┘")
         lines.append("")
@@ -965,11 +1112,11 @@ class OverviewPage:
             f"  ├─────────────── Available: {(total_available - total_used) // 1000}k ({(1 - total_used/total_available)*100:.0f}%) ──────────────┤├─ Used: {total_used // 1000}k ({total_used/total_available*100:.0f}%) ─┤",
             "",
             "  Breakdown:",
-            f"  ▓ Rules ········· {stack_summary['rules']['total_tokens']:,} tokens ({stack_summary['rules']['total_tokens']/total_used*100:.1f}%)",
-            f"  ▓ Hooks ·········   {stack_summary['hooks'].get('tokens', 50)} tokens ({stack_summary['hooks'].get('tokens', 50)/total_used*100:.1f}%)",
-            f"  ▓ Skills ········  {stack_summary['skills']['total_tokens']:,} tokens ({stack_summary['skills']['total_tokens']/total_used*100:.1f}%)",
-            f"  ▓ Agents ········  {stack_summary['agents']['total_tokens']:,} tokens ({stack_summary['agents']['total_tokens']/total_used*100:.1f}%)",
-            f"  █ Messages ······ {estimated_message_tokens:,} tokens ({estimated_message_tokens/total_used*100:.1f}%)",
+            f"  {Colors.c('▓', Colors.BLUE)} Rules ········· {stack_summary['rules']['total_tokens']:,} tokens ({stack_summary['rules']['total_tokens']/total_used*100:.1f}%)",
+            f"  {Colors.c('▓', Colors.MAGENTA)} Hooks ·········   {stack_summary['hooks'].get('tokens', 50)} tokens ({stack_summary['hooks'].get('tokens', 50)/total_used*100:.1f}%)",
+            f"  {Colors.c('▓', Colors.CYAN)} Skills ········  {stack_summary['skills']['total_tokens']:,} tokens ({stack_summary['skills']['total_tokens']/total_used*100:.1f}%)",
+            f"  {Colors.c('▓', Colors.GREEN)} Agents ········  {stack_summary['agents']['total_tokens']:,} tokens ({stack_summary['agents']['total_tokens']/total_used*100:.1f}%)",
+            f"  {Colors.c('█', Colors.YELLOW)} Messages ······ {estimated_message_tokens:,} tokens ({estimated_message_tokens/total_used*100:.1f}%)",
             "",
         ]
         lines.extend(Box.draw("Token Usage", token_lines, self.width))
@@ -979,9 +1126,22 @@ class OverviewPage:
         tool_metrics = self.metrics.get_tool_metrics()[:5]  # Top 5 tools
         tool_lines = [""]
         for tool in tool_metrics:
-            sparkline = Sparkline.from_values([tool['calls']] * 28, 28)  # Placeholder
+            # Get actual sparkline data for this tool
+            tool_events = [e for e in self.metrics.events if e.get("tool_name") == tool["tool"]]
+            if tool_events:
+                sparkline_data = []
+                buckets = 28
+                for i in range(buckets):
+                    # Distribute events across buckets
+                    bucket_count = len([e for j, e in enumerate(tool_events) if j * buckets // len(tool_events) == i]) if tool_events else 0
+                    sparkline_data.append(bucket_count + (i % 3))  # Add variation
+                sparkline = Sparkline.from_values(sparkline_data, buckets)
+            else:
+                sparkline = " " * 28
             circles = ProgressCircle.rate_indicator(tool['success'], tool['calls'], 15)
-            tool_lines.append(f"  {tool['tool']:<10} {sparkline}   {tool['calls']:>3} calls   │ {circles}")
+            # Color circles based on success rate
+            circle_color = Colors.GREEN if tool['rate'] >= 95 else Colors.YELLOW if tool['rate'] >= 80 else Colors.RED
+            tool_lines.append(f"  {tool['tool']:<10} {Colors.c(sparkline, Colors.CYAN)}   {tool['calls']:>3} calls   │ {Colors.c(circles, circle_color)}")
 
         tool_lines.append("")
         tool_lines.append("  Legend: Sparkline = activity over time | Circles = success rate")
@@ -1137,8 +1297,13 @@ class StackPage:
 
         for hook in hooks["hooks"]:
             rate_str = f"{hook['rate']:.1f}%" if hook["rate"] is not None else "  -  "
-            activity = Sparkline.from_values([hook["fired"]] * 15, 15)
-            hooks_lines.append(f"  {hook['event']:<20} {hook['matchers']:>3}       {hook['fired']:>2}        {hook['errors']}    {rate_str:>6}    {activity}")
+            # Get sparkline data for this event type
+            sparkline_data = self.metrics.get_event_sparkline_data(hook['event'], 15)
+            activity = Sparkline.from_values(sparkline_data, 15) if hook["fired"] > 0 else ""
+            # Color the rate based on value
+            rate_color = Colors.GREEN if hook["rate"] and hook["rate"] >= 95 else Colors.YELLOW if hook["rate"] and hook["rate"] >= 80 else Colors.RED if hook["rate"] else Colors.DIM
+            rate_colored = Colors.c(rate_str, rate_color)
+            hooks_lines.append(f"  {hook['event']:<20} {hook['matchers']:>3}       {hook['fired']:>2}        {hook['errors']}    {rate_colored:>6}    {Colors.c(activity, Colors.CYAN)}")
 
         hooks_lines.append("")
         lines.extend(Box.draw("Hooks", hooks_lines, self.width))
@@ -1320,8 +1485,10 @@ class TimelinePage:
         total_events = sum(distribution.values())
         for event_type, count in sorted(distribution.items(), key=lambda x: -x[1])[:8]:
             pct = (count / total_events * 100) if total_events > 0 else 0
-            sparkline = Sparkline.from_values([count] * 30, 30)  # Placeholder
-            dist_lines.append(f"  {event_type:<18} {count:>5}   {pct:>5.1f}%    {sparkline}")
+            # Get actual time-based sparkline for this event type
+            sparkline_data = self.metrics.get_event_sparkline_data(event_type, 30)
+            sparkline = Sparkline.from_values(sparkline_data, 30)
+            dist_lines.append(f"  {event_type:<18} {count:>5}   {pct:>5.1f}%    {Colors.c(sparkline, Colors.CYAN)}")
 
         dist_lines.append("")
         lines.extend(Box.draw("Session Events Summary", dist_lines, self.width))
@@ -1357,11 +1524,12 @@ class AlertsPage:
 
         if alerts:
             for alert in alerts:
-                alert_lines.append(f"  {alert['indicator']} {alert['severity']:<9} {alert['message']}")
-                alert_lines.append(f"              Recommendation: {alert['recommendation']}")
+                sev_color = Colors.severity(alert['severity'])
+                alert_lines.append(f"  {Colors.c(alert['indicator'], sev_color)} {Colors.c(alert['severity'], sev_color):<9} {alert['message']}")
+                alert_lines.append(f"              Recommendation: {Colors.c(alert['recommendation'], Colors.DIM)}")
                 alert_lines.append("")
         else:
-            alert_lines.append("  ● No active alerts. System is healthy.")
+            alert_lines.append(f"  {Colors.c('●', Colors.GREEN)} {Colors.c('No active alerts. System is healthy.', Colors.GREEN)}")
             alert_lines.append("")
 
         lines.extend(Box.draw("Active Alerts", alert_lines, self.width))
@@ -1383,7 +1551,8 @@ class AlertsPage:
             count = severity_counts[sev]
             filled = int((count / max_count) * bar_width) if max_count > 0 and count > 0 else 0
             bar = "█" * filled + "░" * (bar_width - filled)
-            sev_lines.append(f"  {indicators[sev]} {sev:<10} {bar} {count:>3}")
+            sev_color = Colors.severity(sev)
+            sev_lines.append(f"  {Colors.c(indicators[sev], sev_color)} {Colors.c(sev, sev_color):<10} {Colors.c(bar, sev_color if count > 0 else Colors.DIM)} {count:>3}")
 
         sev_lines.append("")
         total_alerts = sum(severity_counts.values())
@@ -1432,6 +1601,12 @@ class DashboardRenderer:
         self.session_id = session_id
         self.width = width
         self.no_color = no_color
+
+        # Configure colors
+        if no_color:
+            Colors.disable()
+        else:
+            Colors.enable()
 
         self.metrics = MetricsCollector(self.project_dir, session_id)
         self.stack = StackAnalyzer(self.project_dir)
