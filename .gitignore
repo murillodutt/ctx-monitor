@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+*.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local development files (not part of plugin)
+CLAUDE.md
+plan.md
+*.plan.md
+
+# Local Claude configuration (project-specific)
+.claude/
+
+# Local settings (not committed)
+*.local.md
+
+# Traces (local data - never commit)
+**/traces/
+**/*.jsonl
+sessions.json
+
+# Development traces
+scripts/.claude/
