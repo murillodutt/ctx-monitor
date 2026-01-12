@@ -330,49 +330,33 @@ class TrendIndicator:
 
 
 class Box:
-    """Box drawing utilities."""
+    """Box drawing utilities - simplified without vertical borders."""
 
-    # Single line box characters
-    TL = "┌"
-    TR = "┐"
-    BL = "└"
-    BR = "┘"
     H = "─"
-    V = "│"
-    LT = "├"
-    RT = "┤"
-    TT = "┬"
-    BT = "┴"
-    CROSS = "┼"
 
     @classmethod
     def draw(cls, title: str, content: List[str], width: int = 78) -> List[str]:
-        """Draw a box with title and content."""
-        inner_width = width - 2
+        """Draw a section with title and content (no vertical borders)."""
         lines = []
 
-        # Top border with title
+        # Title with horizontal line
         if title:
             title_str = f" {title} "
-            padding = inner_width - len(title_str) - 2
-            lines.append(f"{cls.TL}{cls.H}{cls.H}{title_str}{cls.H * padding}{cls.TR}")
+            padding = width - len(title_str) - 4
+            lines.append(f"──{title_str}{cls.H * padding}")
         else:
-            lines.append(f"{cls.TL}{cls.H * inner_width}{cls.TR}")
+            lines.append(cls.H * width)
 
-        # Content
+        # Content (no vertical borders)
         for line in content:
-            padded = line[:inner_width].ljust(inner_width)
-            lines.append(f"{cls.V}{padded}{cls.V}")
-
-        # Bottom border
-        lines.append(f"{cls.BL}{cls.H * inner_width}{cls.BR}")
+            lines.append(line)
 
         return lines
 
     @classmethod
     def separator(cls, width: int = 78) -> str:
         """Draw a horizontal separator."""
-        return f"{cls.LT}{cls.H * (width - 2)}{cls.RT}"
+        return cls.H * width
 
 
 class Table:
@@ -1089,14 +1073,10 @@ class OverviewPage:
         error_spark_colored = Colors.c(error_sparkline, Colors.RED if stats['total_errors'] > 0 else Colors.DIM)
         error_count_colored = Colors.c(f"{stats['total_errors']}", Colors.RED if stats['total_errors'] > 0 else Colors.GREEN)
 
-        # Simplified cards (side by side conceptually)
-        lines.append(f"┌─ {Colors.c('Health', Colors.BOLD)} ────────────┐ ┌─ {Colors.c('Events', Colors.BOLD)} ────────────┐ ┌─ {Colors.c('Errors', Colors.BOLD)} ────────────┐")
-        lines.append(f"│                     │ │                     │ │                     │")
-        lines.append(f"│   {health_display}             │ │   {session['event_count']:,}  total      │ │   {error_count_colored}  ({stats['error_rate']:.1f}%)        │")
-        lines.append(f"│                     │ │     {event_spark_colored}  │ │     {error_spark_colored}  │")
-        lines.append(f"│   Status: {status_display:<10}│ │   events/min        │ │   errors/min        │")
-        lines.append(f"│                     │ │                     │ │                     │")
-        lines.append(f"└─────────────────────┘ └─────────────────────┘ └─────────────────────┘")
+        # Simplified cards without box borders
+        lines.append(f"  {Colors.c('HEALTH', Colors.BOLD + Colors.DIM)}              {Colors.c('EVENTS', Colors.BOLD + Colors.DIM)}              {Colors.c('ERRORS', Colors.BOLD + Colors.DIM)}")
+        lines.append(f"  {health_display}            {session['event_count']:>5} total           {error_count_colored} ({stats['error_rate']:.1f}%)")
+        lines.append(f"  Status: {status_display}        {event_spark_colored}        {error_spark_colored}")
         lines.append("")
 
         # Token Usage
@@ -1109,7 +1089,7 @@ class OverviewPage:
         token_lines = [
             "",
             f"  {self._render_token_bar(total_used, total_available)}",
-            f"  ├─────────────── Available: {(total_available - total_used) // 1000}k ({(1 - total_used/total_available)*100:.0f}%) ──────────────┤├─ Used: {total_used // 1000}k ({total_used/total_available*100:.0f}%) ─┤",
+            f"  Available: {(total_available - total_used) // 1000}k ({(1 - total_used/total_available)*100:.0f}%)                              Used: {total_used // 1000}k ({total_used/total_available*100:.0f}%)",
             "",
             "  Breakdown:",
             f"  {Colors.c('▓', Colors.BLUE)} Rules ········· {stack_summary['rules']['total_tokens']:,} tokens ({stack_summary['rules']['total_tokens']/total_used*100:.1f}%)",
@@ -1141,7 +1121,7 @@ class OverviewPage:
             circles = ProgressCircle.rate_indicator(tool['success'], tool['calls'], 15)
             # Color circles based on success rate
             circle_color = Colors.GREEN if tool['rate'] >= 95 else Colors.YELLOW if tool['rate'] >= 80 else Colors.RED
-            tool_lines.append(f"  {tool['tool']:<10} {Colors.c(sparkline, Colors.CYAN)}   {tool['calls']:>3} calls   │ {Colors.c(circles, circle_color)}")
+            tool_lines.append(f"  {tool['tool']:<10} {Colors.c(sparkline, Colors.CYAN)}   {tool['calls']:>3} calls    {Colors.c(circles, circle_color)}")
 
         tool_lines.append("")
         tool_lines.append("  Legend: Sparkline = activity over time | Circles = success rate")
@@ -1640,21 +1620,21 @@ class DashboardRenderer:
         """Render message when no data is available."""
         lines = []
         lines.append("")
-        lines.append("┌──────────────────────────────────────────────────────────────────────────────┐")
-        lines.append("│                                                                              │")
-        lines.append("│  CTX-MONITOR DASHBOARD                                                       │")
-        lines.append("│                                                                              │")
-        lines.append("│  No monitoring data available.                                               │")
-        lines.append("│                                                                              │")
-        lines.append("│  To start monitoring, run:                                                   │")
-        lines.append("│                                                                              │")
-        lines.append("│    /ctx-monitor:start                                                        │")
-        lines.append("│                                                                              │")
-        lines.append("│  Then perform some operations and run:                                       │")
-        lines.append("│                                                                              │")
-        lines.append("│    /ctx-monitor:dashboard                                                    │")
-        lines.append("│                                                                              │")
-        lines.append("└──────────────────────────────────────────────────────────────────────────────┘")
+        lines.append("─" * 78)
+        lines.append("")
+        lines.append("  CTX-MONITOR DASHBOARD")
+        lines.append("")
+        lines.append("  No monitoring data available.")
+        lines.append("")
+        lines.append("  To start monitoring, run:")
+        lines.append("")
+        lines.append("    /ctx-monitor:start")
+        lines.append("")
+        lines.append("  Then perform some operations and run:")
+        lines.append("")
+        lines.append("    /ctx-monitor:dashboard")
+        lines.append("")
+        lines.append("─" * 78)
         lines.append("")
         return "\n".join(lines)
 
