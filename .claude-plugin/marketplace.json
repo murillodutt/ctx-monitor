@@ -12,11 +12,11 @@
       "description": "Observability and auditing plugin for Claude Code CLI context engineering",
       "author": {
         "name": "Murillo Dutt",
-        "email": "murillo@duttyeshua.com",
-        },
-        "source": "./plugins/ctx-monitor",
-        "category": "development",
-        "homepage": "https://github.com/murillodutt/ctx-monitor"
+        "email": "murillo@duttyeshua.com"
+      },
+      "source": "./plugins/ctx-monitor",
+      "category": "development",
+      "homepage": "https://github.com/murillodutt/ctx-monitor"
     }
   ]
 }
