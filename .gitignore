@@ -29,6 +29,7 @@ plan.md
 
 # Local settings (not committed)
 *.local.md
+!plugins/*/templates/*.local.md
 
 # Traces (local data - never commit)
 **/traces/

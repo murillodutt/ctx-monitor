@@ -35,7 +35,7 @@ Stop event logging for the current session. Optionally preserve or clean up logs
    ```json
    {
      "enabled": false,
-     "level": "<previous_level>",
+     "log_level": "<previous_log_level>",
      "stopped_at": "<output_from_date_command>",
      "session_id": "<session_id>"
    }

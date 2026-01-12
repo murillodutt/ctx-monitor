@@ -93,10 +93,9 @@ Configure via `/config` command or edit `.claude/ctx-monitor.local.md`:
 
 ```yaml
 ---
-log_level: debug
-capture_tools: true
-capture_agents: true
-anonymize_exports: true
+enabled: true
+log_level: medium  # minimal | medium | full
+anonymize_on_export: true
 ---
 ```
 

@@ -1,0 +1,39 @@
+name: Bug Report
+description: Report a bug to help us improve ctx-monitor
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please provide as many technical details as possible.
+  - type: textarea
+    id: description
+    attributes:
+      label: Problem Description
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: How can we find the bug?
+      placeholder: |
+        1. Run /ctx-monitor:start
+        2. Execute task X...
+        3. See the error in /ctx-monitor:report
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Claude Code CLI Version
+      placeholder: e.g., 2.1.0
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: ctx-monitor Logs
+      description: Paste relevant output from `.claude/ctx-monitor/traces/` or `/report` here.
+      render: json

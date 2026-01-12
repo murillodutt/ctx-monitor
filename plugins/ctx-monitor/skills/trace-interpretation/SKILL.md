@@ -2,7 +2,7 @@
 name: trace-interpretation
 description: |
   This skill should be used when the user asks about "interpreting ctx-monitor traces", "understanding execution logs", "reading trace files", "what do ctx-monitor events mean", "debugging trace output", or needs guidance on trace file formats, event types, common failure patterns, or troubleshooting ctx-monitor output.
-version: 0.3.0
+version: 0.3.5
 ---
 
 # Trace Interpretation Guide

@@ -1,0 +1,26 @@
+name: Feature Request
+description: Suggest an idea for ctx-monitor
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: vision
+    attributes:
+      label: What is your idea?
+      description: Clearly describe what you would like to see in ctx-monitor.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Why is this feature necessary?
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected Area
+      options:
+        - Core Engine (Logging/Hooks)
+        - Commands (Audit/Diff/Report)
+        - Agent (trace-analyzer)
+        - Dashboard
+        - Documentation

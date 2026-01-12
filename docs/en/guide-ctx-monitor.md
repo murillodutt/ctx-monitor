@@ -8,7 +8,7 @@
 
 | Field | Value |
 |-------|-------|
-| Version | 0.3.1 |
+| Version | 0.3.5 |
 | Date | 2026-01-12 |
 | Author | Murillo Dutt |
 | Organization | Dutt Yeshua Technology Ltd |
@@ -1623,4 +1623,4 @@ ls .claude/ctx-monitor/traces/
 
 **End of Manual**
 
-Version 0.3.0 - 2026-01-12
+Version 0.3.5 - 2026-01-12

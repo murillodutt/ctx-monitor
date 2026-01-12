@@ -8,7 +8,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| Versao | 0.3.1 |
+| Versao | 0.3.5 |
 | Data | 2026-01-12 |
 | Autor | Murillo Dutt |
 | Organizacao | Dutt Yeshua Technology Ltd |
@@ -1824,4 +1824,4 @@ ls .claude/ctx-monitor/traces/
 
 **Fim do Manual**
 
-Versao 0.3.1 - 2026-01-12
+Versao 0.3.5 - 2026-01-12

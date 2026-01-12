@@ -1,0 +1,39 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+      - chore
+    authors:
+      - octocat
+  include:
+    paths:
+      - plugins/**/*
+  categories:
+    - title: "Features"
+      labels:
+        - "enhancement"
+        - "feature"
+    - title: "Bug Fixes"
+      labels:
+        - "bug"
+        - "fix"
+    - title: "Improvements"
+      labels:
+        - "performance"
+        - "ui"
+        - "ux"
+        - "refactor"
+    - title: "Documentation"
+      labels:
+        - "documentation"
+        - "docs"
+    - title: "Security"
+      labels:
+        - "security"
+    - title: "Maintenance"
+      labels:
+        - "maintenance"
+        - "dependencies"
+    - title: "Breaking Changes"
+      labels:
+        - "breaking-change"

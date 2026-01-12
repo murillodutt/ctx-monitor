@@ -1,0 +1,54 @@
+name: Linting and Quality
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Linting Tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+          sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Lint Python (Ruff)
+        run: ruff check plugins/ctx-monitor/scripts/
+
+      - name: Lint Bash (ShellCheck)
+        run: |
+          find plugins/ctx-monitor/ -name "*.sh" -exec shellcheck {} +
+
+      - name: Check Clean Root
+        run: |
+          # List of allowed files in root
+          ALLOWED_FILES=".gitignore CLAUDE.md plugins docs .github .claude-plugin .cursor"
+          ROOT_FILES=$(ls -A)
+          
+          for file in $ROOT_FILES; do
+            is_allowed=false
+            for allowed in $ALLOWED_FILES; do
+              if [ "$file" == "$allowed" ]; then
+                is_allowed=true
+                break
+              fi
+            done
+            
+            if [ "$is_allowed" == "false" ]; then
+              echo "Error: File '$file' is not allowed in the repository root."
+              exit 1
+            fi
+          done
+          echo "Repository root is clean."

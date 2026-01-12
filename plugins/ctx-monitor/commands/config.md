@@ -63,16 +63,16 @@ anonymize_on_export: true
 
 ## Available Settings
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| `enabled` | boolean | true | Enable/disable logging for project |
-| `log_level` | string | medium | Logging detail level |
-| `events` | array | all | Events to capture |
-| `retention_days` | integer | 30 | Days to keep traces |
-| `max_sessions` | integer | 100 | Maximum sessions to retain |
-| `anonymize_on_export` | boolean | true | Auto-anonymize exports |
-| `tools_filter` | array | [] | Only log these tools |
-| `exclude_patterns` | array | [] | Skip events matching patterns |
+| Key | Type | Default | Description | Status |
+|-----|------|---------|-------------|--------|
+| `enabled` | boolean | true | Enable/disable logging for project | Active |
+| `log_level` | string | medium | Logging detail level | Active |
+| `events` | array | all | Events to capture | Active |
+| `retention_days` | integer | 30 | Days to keep traces | Planned |
+| `max_sessions` | integer | 100 | Maximum sessions to retain | Planned |
+| `anonymize_on_export` | boolean | true | Auto-anonymize exports | Active |
+| `tools_filter` | array | [] | Only log these tools | Planned |
+| `exclude_patterns` | array | [] | Skip events matching patterns | Planned |
 
 ## Log Levels
 

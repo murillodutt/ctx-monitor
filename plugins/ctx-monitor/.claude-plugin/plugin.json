@@ -5,5 +5,14 @@
   "author": {
     "name": "Murillo Dutt",
     "email": "murillo@duttyeshua.com"
+  },
+  "repository": "https://github.com/murillodutt/ctx-monitor",
+  "keywords": ["observability", "monitoring", "tracing", "auditing", "debugging"],
+  "license": "MIT",
+  "components": {
+    "commands": ["start", "stop", "dashboard", "report", "diff", "audit", "config", "export-bundle", "doctor"],
+    "agents": ["trace-analyzer"],
+    "skills": ["trace-interpretation"],
+    "hooks": ["hooks.json"]
   }
 }

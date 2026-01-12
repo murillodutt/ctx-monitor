@@ -3,7 +3,7 @@
 Complete manual for developing plugins for Claude Code CLI.
 
 **Based on:** claude-plugins-official (Anthropic) + official plugin-dev
-**Version:** 0.3.0
+**Version:** 0.3.5
 **Last updated:** 2026-01-12
 
 ---
@@ -94,15 +94,95 @@ In the `.claude-plugin/` folder at the **repository root**:
     {
       "name": "your-plugin",
       "description": "Plugin description",
+      "version": "1.0.0",
       "author": {
         "name": "Your Name",
         "email": "email@example.com"
       },
       "source": "./plugins/your-plugin",
       "category": "development",
-      "homepage": "https://github.com/user/repo"
+      "homepage": "https://github.com/user/repo",
+      "tags": ["community-managed"]
     }
   ]
+}
+```
+
+### marketplace.json Field Reference
+
+#### Root Level Fields
+
+| Field | Required | Type | Description |
+|-------|----------|------|-------------|
+| `$schema` | No | string | JSON schema URL for validation |
+| `name` | **Yes** | string | Unique marketplace identifier |
+| `description` | **Yes** | string | Brief marketplace description |
+| `owner` | **Yes** | object | Marketplace owner information |
+| `plugins` | **Yes** | array | List of plugin definitions |
+
+#### Owner Object
+
+| Field | Required | Type | Description |
+|-------|----------|------|-------------|
+| `name` | **Yes** | string | Owner/organization name |
+| `email` | **Yes** | string | Contact email |
+
+#### Plugin Entry Fields
+
+| Field | Required | Type | Description |
+|-------|----------|------|-------------|
+| `name` | **Yes** | string | Plugin identifier (kebab-case) |
+| `description` | **Yes** | string | Plugin functionality overview |
+| `author` | **Yes** | object | Plugin creator (name, email) |
+| `source` | **Yes** | string/object | Plugin location (path or URL object) |
+| `category` | **Yes** | string | Classification category |
+| `version` | No | string | Semantic version (e.g., "1.0.0") |
+| `homepage` | No | string | Project homepage/repository URL |
+| `tags` | No | array | Labels (e.g., "community-managed") |
+| `strict` | No | boolean | Strictness enforcement flag |
+| `lspServers` | No | object | Language Server Protocol config |
+
+#### Available Categories
+
+- `development` - Development tools and workflows
+- `productivity` - Productivity enhancements
+- `security` - Security tools and guidance
+- `learning` - Educational resources
+- `testing` - Testing utilities
+- `database` - Database tools
+- `design` - Design utilities
+- `deployment` - Deployment automation
+- `monitoring` - Monitoring and observability
+
+#### Source Formats
+
+**Path reference (recommended for internal plugins):**
+```json
+"source": "./plugins/your-plugin"
+```
+
+**URL object (for external repositories):**
+```json
+"source": {
+  "source": "url",
+  "url": "https://github.com/user/repo.git"
+}
+```
+
+#### LSP Server Configuration (Optional)
+
+For plugins that provide Language Server Protocol integration:
+
+```json
+"lspServers": {
+  "server-name": {
+    "command": "executable-name",
+    "args": ["--arg1", "--arg2"],
+    "extensionToLanguage": {
+      ".ext": "language-id"
+    },
+    "startupTimeout": 5000
+  }
 }
 ```
 
@@ -147,6 +227,21 @@ plugin-name/
 
 Location: `.claude-plugin/plugin.json`
 
+#### Minimal Example (Official Anthropic Pattern)
+
+```json
+{
+  "name": "your-plugin",
+  "description": "Plugin description",
+  "author": {
+    "name": "Your Name",
+    "email": "email@example.com"
+  }
+}
+```
+
+#### Extended Example (With Optional Fields)
+
 ```json
 {
   "name": "your-plugin",
@@ -154,15 +249,30 @@ Location: `.claude-plugin/plugin.json`
   "version": "1.0.0",
   "author": {
     "name": "Your Name",
-    "email": "email@example.com",
-    "url": "https://example.com"
-  },
-  "homepage": "https://docs.example.com",
-  "repository": "https://github.com/user/plugin-name",
-  "license": "MIT",
-  "keywords": ["testing", "automation"]
+    "email": "email@example.com"
+  }
 }
 ```
+
+### plugin.json Field Reference
+
+| Field | Required | Type | Description |
+|-------|----------|------|-------------|
+| `name` | **Yes** | string | Plugin identifier (kebab-case). Defines command namespace. |
+| `description` | **Yes** | string | Brief plugin functionality description |
+| `author` | **Yes** | object | Plugin creator information |
+| `version` | No | string | Semantic version (e.g., "1.0.0") |
+
+#### Author Object
+
+| Field | Required | Type | Description |
+|-------|----------|------|-------------|
+| `name` | **Yes** | string | Author/organization name |
+| `email` | **Yes** | string | Contact email |
+
+> **Note:** Official Anthropic plugins use only `name`, `description`, and `author`. The `version` field is optional but recommended for tracking releases.
+
+### Namespace Behavior
 
 The `name` field defines the **namespace** of commands:
 - `name: "ctx-monitor"` -> commands appear as `/ctx-monitor:*`

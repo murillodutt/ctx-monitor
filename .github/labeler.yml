@@ -1,0 +1,24 @@
+# Labeler configuration
+# Maps labels to changed files paths
+
+"enhancement":
+  - plugins/ctx-monitor/agents/**/*
+  - plugins/ctx-monitor/skills/**/*
+  - plugins/ctx-monitor/commands/**/*
+
+"bug":
+  - any: ["**/test/**", "**/tests/**"]
+
+"documentation":
+  - any: ["**/*.md", "docs/**/*"]
+  - plugins/ctx-monitor/README.md
+
+"core":
+  - plugins/ctx-monitor/hooks/**/*
+  - plugins/ctx-monitor/scripts/event-logger.sh
+
+"scripts":
+  - plugins/ctx-monitor/scripts/**/*
+
+"governance":
+  - .github/**/*

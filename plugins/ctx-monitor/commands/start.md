@@ -39,7 +39,7 @@ Start event logging for the current Claude Code session. Creates trace directory
    ```json
    {
      "enabled": true,
-     "level": "medium",
+     "log_level": "medium",
      "started_at": "<output_from_date_command>",
      "session_id": "<current_session_id>"
    }
