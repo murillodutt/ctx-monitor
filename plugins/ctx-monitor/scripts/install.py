@@ -270,7 +270,7 @@ This file configures ctx-monitor behavior for this project.
         try:
             status = {
                 "installed_at": datetime.now().isoformat(),
-                "version": "0.3.1",
+                "version": "0.3.5",
                 "plugin_dir": str(self.plugin_dir) if self.plugin_dir else None,
                 "project_dir": str(self.project_dir)
             }

@@ -167,6 +167,59 @@ cat session_abc123.jsonl | jq -s 'group_by(.event_type) | map({type: .[0].event_
    - Use `/ctx-monitor:diff` against known-good session
    - Identify what changed
 
+## Analysis Agents
+
+ctx-monitor provides specialized agents for different analysis needs:
+
+### quick-validator (Haiku)
+
+**Model**: Haiku (fast, cost-efficient)
+**Purpose**: Deterministic validation tasks
+
+**Use for**:
+- Schema validation
+- Event counting
+- Timestamp verification
+- Integrity checks
+- Corruption detection
+
+**Example triggers**:
+- "validate my traces"
+- "how many events in my traces?"
+- "check if trace files are corrupted"
+
+**Escape mechanism**: If quick-validator detects anomalies requiring reasoning (error rate > 10%, orphan events, timing issues), it will stop and suggest using trace-analyzer.
+
+### trace-analyzer (inherit)
+
+**Model**: Inherits from session (user controls via `/model`)
+**Purpose**: Deep analysis requiring reasoning
+
+**Use for**:
+- Pattern identification
+- Root cause analysis
+- Event correlation
+- Remediation recommendations
+
+**Example triggers**:
+- "analyze my traces"
+- "why are there errors?"
+- "find issues in execution"
+
+**Best practice**: For complex analysis, set `/model opus` before invoking.
+
+### Recommended Workflow
+
+```
+1. Start with quick-validator for fast validation
+   └─ Uses Haiku (cheap, fast)
+   └─ If anomalies detected → suggests next step
+
+2. For deep analysis, use trace-analyzer
+   └─ Set model first: /model sonnet or /model opus
+   └─ Run trace-analyzer for reasoning tasks
+```
+
 ## Using Analysis Tools
 
 ### Generate Report

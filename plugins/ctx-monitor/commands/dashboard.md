@@ -1,86 +1,43 @@
 ---
-description: Display rich visual dashboard with session metrics, stack analysis, and alerts
-argument-hint: "[--page <name>] [--session <id>] [--no-color]"
+description: Launch interactive web dashboard with real-time metrics
+argument-hint: "[--port <number>] [--no-open]"
 allowed-tools:
   - Bash
   - Read
 ---
 
-# Session Dashboard
+# Web Dashboard
 
-Display a rich Unicode dashboard with multiple pages of information about the current monitoring session.
-
-## Pages
-
-- **overview** (default): Health score, events, token usage, tool activity, quick stats
-- **stack**: Context engineering stack (rules, hooks, skills, agents) with detailed breakdown
-- **tools**: Tool performance with bar charts, histograms, and detailed metrics
-- **timeline**: Event flow and distribution over time
-- **alerts**: Active alerts, severity distribution, recommendations
+Launch an interactive web dashboard in your browser.
 
 ## Instructions
 
-1. Parse arguments from the user input:
-   - `--page <name>`: Page to display (overview, stack, tools, timeline, alerts)
-   - `--session <id>`: Specific session ID (default: most recent)
-   - `--no-color`: Disable ANSI color codes
+1. Parse arguments: `--port <number>` (default: 3847), `--no-open` (don't open browser)
 
-2. Run the dashboard renderer:
+2. Launch the dashboard server:
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/dashboard-renderer.py" "$(pwd)" --page overview
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/dashboard_server.py" "$(pwd)"
 ```
 
-3. If a specific page was requested:
+3. With custom port:
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/dashboard-renderer.py" "$(pwd)" --page <page_name>
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/dashboard_server.py" "$(pwd)" --port <port>
 ```
 
-4. If a specific session was requested:
+4. With `--no-open`:
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/dashboard-renderer.py" "$(pwd)" --session <session_id> --page <page_name>
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/dashboard_server.py" "$(pwd)" --no-open
 ```
 
-5. Display the output directly to the user without any modifications.
+5. Server opens dashboard in browser automatically. Stop with Ctrl+C.
 
-6. If no monitoring data exists, inform the user to run `/ctx-monitor:start` first.
-
-## Usage Examples
+## Usage
 
 ```bash
-# View overview (default)
 /ctx-monitor:dashboard
-
-# View context engineering stack
-/ctx-monitor:dashboard --page stack
-
-# View tool performance
-/ctx-monitor:dashboard --page tools
-
-# View activity timeline
-/ctx-monitor:dashboard --page timeline
-
-# View alerts and recommendations
-/ctx-monitor:dashboard --page alerts
-
-# View specific session
-/ctx-monitor:dashboard --session abc123 --page overview
-
-# Disable colors (for logs)
-/ctx-monitor:dashboard --no-color
+/ctx-monitor:dashboard --port 4000
+/ctx-monitor:dashboard --no-open
 ```
-
-## Output
-
-The dashboard displays rich Unicode visualizations including:
-
-- Sparklines using block characters: `▁▂▃▄▅▆▇█`
-- Progress circles: `○◔◑◕●` (0%, 25%, 50%, 75%, 100%)
-- Horizontal bar charts with `░▒▓█`
-- Trend indicators: `↑↓↗↘→`
-- Box drawing characters for layout
-- Tree structures for hierarchical data
-
-All visualizations work in standard terminal environments without requiring special fonts or color support.

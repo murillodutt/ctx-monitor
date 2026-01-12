@@ -20,8 +20,13 @@
 
 ### 1. Installation
 
+#### Quick Install (curl)
 ```bash
-# Via Official Marketplace
+curl -sSL https://raw.githubusercontent.com/murillodutt/ctx-monitor/main/plugins/ctx-monitor/scripts/install.sh | bash
+```
+
+#### Via Marketplace (Recommended)
+```bash
 /plugin add murillodutt/ctx-monitor
 /plugin install ctx-monitor@dutt-plugins-official
 ```

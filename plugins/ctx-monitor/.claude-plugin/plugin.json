@@ -11,7 +11,7 @@
   "license": "MIT",
   "components": {
     "commands": ["start", "stop", "dashboard", "report", "diff", "audit", "config", "export-bundle", "doctor"],
-    "agents": ["trace-analyzer"],
+    "agents": ["trace-analyzer", "quick-validator"],
     "skills": ["trace-interpretation"],
     "hooks": ["hooks.json"]
   }
