@@ -1,7 +1,7 @@
 {
   "name": "ctx-monitor",
   "description": "Observability and auditing plugin for Claude Code CLI context engineering",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "author": {
     "name": "Murillo Dutt",
     "email": "murillo@duttyeshua.com"
