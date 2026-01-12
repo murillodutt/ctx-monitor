@@ -8,7 +8,7 @@
 
 | Field | Value |
 |-------|-------|
-| Version | 0.3.0 |
+| Version | 0.3.1 |
 | Date | 2026-01-12 |
 | Author | Murillo Dutt |
 | Organization | Dutt Yeshua Technology Ltd |

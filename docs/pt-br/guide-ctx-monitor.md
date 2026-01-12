@@ -8,7 +8,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| Versao | 0.3.0 |
+| Versao | 0.3.1 |
 | Data | 2026-01-12 |
 | Autor | Murillo Dutt |
 | Organizacao | Dutt Yeshua Technology Ltd |
@@ -274,13 +274,24 @@ curl -sSL https://raw.githubusercontent.com/murillodutt/ctx-monitor/main/install
 
 ### 4.4 Configuracao Inicial
 
-Apos a instalacao, inicialize a configuracao para seu projeto:
+Apos a instalacao, execute o comando doctor para configurar o plugin:
 
 ```bash
-/ctx-monitor:config init
+/ctx-monitor:doctor
 ```
 
-Este comando cria o arquivo `.claude/ctx-monitor.local.md` com as configuracoes padrao.
+O comando doctor realiza automaticamente:
+- Verificacao de dependencias (Python 3.7+)
+- Criacao da estrutura de diretorios
+- Limpeza de cache corrompido (se houver)
+- Criacao do arquivo de configuracao padrao
+- Validacao de hooks e scripts
+
+Se preferir apenas verificar o status sem fazer alteracoes:
+
+```bash
+/ctx-monitor:doctor --check
+```
 
 ### 4.5 Arquivo de Configuracao
 
@@ -334,9 +345,65 @@ Isso evita que traces locais e configuracoes especificas sejam commitados ao rep
 
 ## 5. Comandos Disponiveis
 
-O ctx-monitor fornece sete comandos slash, todos prefixados com o namespace do plugin.
+O ctx-monitor fornece oito comandos slash, todos prefixados com o namespace do plugin.
 
-### 5.1 /ctx-monitor:start
+### 5.1 /ctx-monitor:doctor
+
+**Proposito**: Diagnosticar, instalar e corrigir problemas de configuracao automaticamente.
+
+**Sintaxe**:
+```bash
+/ctx-monitor:doctor [--check] [--repair]
+```
+
+**Parametros**:
+- `--check`: Apenas verificar, sem modificar nada
+- `--repair`: Forcar reinstalacao/reparo
+
+**O que o Doctor Faz**:
+
+| Verificacao | Acao Automatica |
+|-------------|-----------------|
+| Referencias de cache orfas | Remove de installed_plugins.json |
+| Diretorios de cache vazios | Deleta diretorios corrompidos |
+| Symlinks quebrados | Remove links invalidos |
+| Permissoes de scripts | chmod +x em arquivos .sh |
+| Diretorios faltando | Cria estrutura necessaria |
+| Arquivo de config | Cria configuracao padrao |
+
+**Exemplo**:
+```bash
+# Diagnostico completo + correcao + instalacao
+/ctx-monitor:doctor
+
+# Apenas verificar status
+/ctx-monitor:doctor --check
+
+# Forcar reparo/reinstalacao
+/ctx-monitor:doctor --repair
+```
+
+**Output Exemplo**:
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  CTX-MONITOR DOCTOR                                                          │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+→ Checking for orphaned cache references...
+  ✓ Cleaned 1 orphaned cache reference(s)
+
+→ Checking cache directories...
+  ✓ Cache directories OK
+
+→ Checking script permissions...
+  ✓ Script permissions OK
+
+  ✓ All problems fixed!
+```
+
+### 5.2 /ctx-monitor:start
+
+**Nota**: O comando start verifica automaticamente se o plugin esta instalado. Se nao estiver, sugere executar `/ctx-monitor:doctor` primeiro.
 
 **Proposito**: Inicia o monitoramento de eventos para a sessao atual.
 
@@ -1757,4 +1824,4 @@ ls .claude/ctx-monitor/traces/
 
 **Fim do Manual**
 
-Versao 0.3.0 - 2026-01-12
+Versao 0.3.1 - 2026-01-12

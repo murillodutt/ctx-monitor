@@ -1,6 +1,6 @@
 # dutt-plugins-official
 
-[![Version](https://img.shields.io/badge/version-0.3.0-green.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.3.1-green.svg)](CHANGELOG.md)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Marketplace-purple.svg)](https://claude.ai/code)
 
@@ -45,6 +45,7 @@ Then install the plugin:
 
 | Command | Description |
 |---------|-------------|
+| `/doctor` | **First run**: Diagnose, install, and fix problems automatically |
 | `/start` | Start monitoring session |
 | `/stop` | Stop monitoring and save trace |
 | `/dashboard` | Display visual dashboard with metrics and stack analysis |
@@ -53,6 +54,20 @@ Then install the plugin:
 | `/diff` | Compare two execution traces |
 | `/config` | Configure monitoring settings |
 | `/export-bundle` | Export anonymized diagnostic bundle |
+
+### First Time Setup
+
+After installing, run the doctor command to set up ctx-monitor:
+
+```bash
+/ctx-monitor:doctor
+```
+
+This will automatically:
+- Check dependencies
+- Create required directories
+- Fix any cache or configuration issues
+- Set up default configuration
 
 ## Configuration
 

@@ -10,10 +10,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Real-time monitoring dashboard
 - Integration with external observability platforms
 - Custom audit rule definitions
 - Performance benchmarking tools
+
+---
+
+## [0.3.1] - 2026-01-12
+
+### Added
+
+**Doctor Command**
+- `/ctx-monitor:doctor` - New command for diagnostics, installation, and auto-repair
+- Automatic detection and cleanup of orphaned cache references
+- Empty/corrupted cache directory cleanup
+- Broken symlink detection and removal
+- Script permission fixes (chmod +x)
+- Hybrid approach: detects issues and guides user to fix them
+
+**Dashboard Command**
+- `/ctx-monitor:dashboard` - Visual dashboard with Unicode graphics
+- Five navigable pages: Overview, Stack, Tools, Timeline, Alerts
+- Health score calculation with configurable weights
+- Sparklines for activity visualization over time
+- Progress circles for success rate indicators
+- ANSI color support for better readability
+- Context engineering stack analysis (rules, hooks, skills, agents)
+
+**Installation Improvements**
+- Pre-install diagnostics to clean up issues automatically
+- Installation verification in start/stop commands
+- Helpful error messages pointing to `/ctx-monitor:doctor`
+
+### Changed
+- Start command now checks installation before proceeding
+- Stop command now checks installation before proceeding
+- Updated documentation to reflect new commands
+
+### Fixed
+- Hook errors from corrupted plugin cache references
+- Empty sparklines in dashboard when no time-based data available
 
 ---
 
@@ -77,6 +113,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Description |
 |---------|------|-------------|
+| 0.3.1 | 2026-01-12 | Doctor command, Dashboard, Installation improvements |
 | 0.3.0 | 2026-01-12 | Initial public release |
 
 ---

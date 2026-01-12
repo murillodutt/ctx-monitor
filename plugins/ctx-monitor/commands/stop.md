@@ -13,19 +13,25 @@ Stop event logging for the current session. Optionally preserve or clean up logs
 
 ## Instructions
 
-1. Parse the optional `--keep-logs` flag:
+1. **Check installation first**:
+   ```bash
+   bash "${CLAUDE_PLUGIN_ROOT}/scripts/check-install.sh" "$(pwd)"
+   ```
+   If this returns an error, stop and show the message to the user. Do not proceed.
+
+2. Parse the optional `--keep-logs` flag:
    - If present: Keep all trace files
    - If absent: Keep logs by default (never auto-delete)
 
-2. Read the current configuration from `.claude/ctx-monitor/config.json`
+3. Read the current configuration from `.claude/ctx-monitor/config.json`
 
-3. Generate the timestamp using bash to ensure correct ISO 8601 format:
+4. Generate the timestamp using bash to ensure correct ISO 8601 format:
    ```bash
    date +"%Y-%m-%dT%H:%M:%S%z" | sed 's/\([+-][0-9][0-9]\)\([0-9][0-9]\)$/\1:\2/'
    ```
    Note: Use the actual command output, not a placeholder or approximation.
 
-4. Update the configuration to disable monitoring:
+5. Update the configuration to disable monitoring:
    ```json
    {
      "enabled": false,
@@ -35,7 +41,7 @@ Stop event logging for the current session. Optionally preserve or clean up logs
    }
    ```
 
-5. Report summary to user:
+6. Report summary to user:
    - Session duration
    - Number of events captured
    - Path to trace files
