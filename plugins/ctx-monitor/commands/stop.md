@@ -19,17 +19,23 @@ Stop event logging for the current session. Optionally preserve or clean up logs
 
 2. Read the current configuration from `.claude/ctx-monitor/config.json`
 
-3. Update the configuration to disable monitoring:
+3. Generate the timestamp using bash to ensure correct ISO 8601 format:
+   ```bash
+   date +"%Y-%m-%dT%H:%M:%S%z" | sed 's/\([+-][0-9][0-9]\)\([0-9][0-9]\)$/\1:\2/'
+   ```
+   Note: Use the actual command output, not a placeholder or approximation.
+
+4. Update the configuration to disable monitoring:
    ```json
    {
      "enabled": false,
      "level": "<previous_level>",
-     "stopped_at": "<timestamp>",
+     "stopped_at": "<output_from_date_command>",
      "session_id": "<session_id>"
    }
    ```
 
-4. Report summary to user:
+5. Report summary to user:
    - Session duration
    - Number of events captured
    - Path to trace files

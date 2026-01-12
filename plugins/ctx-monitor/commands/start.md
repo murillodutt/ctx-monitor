@@ -23,17 +23,23 @@ Start event logging for the current Claude Code session. Creates trace directory
    mkdir -p .claude/ctx-monitor/traces
    ```
 
-3. Create or update the session configuration file at `.claude/ctx-monitor/config.json`:
+3. Generate the timestamp using bash to ensure correct ISO 8601 format:
+   ```bash
+   date +"%Y-%m-%dT%H:%M:%S%z" | sed 's/\([+-][0-9][0-9]\)\([0-9][0-9]\)$/\1:\2/'
+   ```
+   Note: Use the actual command output, not a placeholder or approximation.
+
+4. Create or update the session configuration file at `.claude/ctx-monitor/config.json`:
    ```json
    {
      "enabled": true,
      "level": "medium",
-     "started_at": "<timestamp>",
+     "started_at": "<output_from_date_command>",
      "session_id": "<current_session_id>"
    }
    ```
 
-4. Confirm to the user that monitoring has started with the selected level.
+5. Confirm to the user that monitoring has started with the selected level.
 
 ## Usage Examples
 

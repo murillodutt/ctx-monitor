@@ -47,6 +47,7 @@ Then install the plugin:
 |---------|-------------|
 | `/start` | Start monitoring session |
 | `/stop` | Stop monitoring and save trace |
+| `/dashboard` | Display visual dashboard with metrics and stack analysis |
 | `/report` | Generate execution report |
 | `/audit` | Run compliance audit on traces |
 | `/diff` | Compare two execution traces |

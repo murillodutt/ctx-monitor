@@ -23,17 +23,18 @@
 3. [Arquitetura do Plugin](#3-arquitetura-do-plugin)
 4. [Instalacao e Configuracao](#4-instalacao-e-configuracao)
 5. [Comandos Disponiveis](#5-comandos-disponiveis)
-6. [Sistema de Eventos](#6-sistema-de-eventos)
-7. [Analise de Traces](#7-analise-de-traces)
-8. [Auditorias Modulares](#8-auditorias-modulares)
-9. [Comparacao de Execucoes](#9-comparacao-de-execucoes)
-10. [Exportacao de Diagnosticos](#10-exportacao-de-diagnosticos)
-11. [Agent trace-analyzer](#11-agent-trace-analyzer)
-12. [Skill trace-interpretation](#12-skill-trace-interpretation)
-13. [Padroes de Falha Comuns](#13-padroes-de-falha-comuns)
-14. [Casos de Uso Praticos](#14-casos-de-uso-praticos)
-15. [Resolucao de Problemas](#15-resolucao-de-problemas)
-16. [Referencia Tecnica](#16-referencia-tecnica)
+6. [Dashboard Visual](#6-dashboard-visual)
+7. [Sistema de Eventos](#7-sistema-de-eventos)
+8. [Analise de Traces](#8-analise-de-traces)
+9. [Auditorias Modulares](#9-auditorias-modulares)
+10. [Comparacao de Execucoes](#10-comparacao-de-execucoes)
+11. [Exportacao de Diagnosticos](#11-exportacao-de-diagnosticos)
+12. [Agent trace-analyzer](#12-agent-trace-analyzer)
+13. [Skill trace-interpretation](#13-skill-trace-interpretation)
+14. [Padroes de Falha Comuns](#14-padroes-de-falha-comuns)
+15. [Casos de Uso Praticos](#15-casos-de-uso-praticos)
+16. [Resolucao de Problemas](#16-resolucao-de-problemas)
+17. [Referencia Tecnica](#17-referencia-tecnica)
 
 ---
 
@@ -146,6 +147,7 @@ ctx-monitor/
 ├── commands/                     # Comandos slash disponiveis
 │   ├── start.md                 # /ctx-monitor:start
 │   ├── stop.md                  # /ctx-monitor:stop
+│   ├── dashboard.md             # /ctx-monitor:dashboard
 │   ├── report.md                # /ctx-monitor:report
 │   ├── audit.md                 # /ctx-monitor:audit
 │   ├── diff.md                  # /ctx-monitor:diff
@@ -560,11 +562,143 @@ O processo de anonimizacao remove:
 /ctx-monitor:export-bundle --output ./diagnostics/issue-123.zip
 ```
 
+### 5.8 /ctx-monitor:dashboard
+
+**Proposito**: Exibe dashboard visual com metricas e analise do context engineering stack.
+
+**Sintaxe**:
+```bash
+/ctx-monitor:dashboard [--page <name>] [--session <id>] [--no-color]
+```
+
+**Parametros**:
+- `--page`: Pagina a exibir (overview, stack, tools, timeline, alerts)
+- `--session`: ID especifico da sessao (padrao: mais recente)
+- `--no-color`: Desabilitar cores ANSI
+
+**Paginas Disponiveis**:
+
+| Pagina | Descricao |
+|--------|-----------|
+| overview | Health score, eventos, token usage, tool activity (default) |
+| stack | Context engineering stack (rules, hooks, skills, agents) |
+| tools | Performance de ferramentas com graficos e histogramas |
+| timeline | Fluxo de eventos e distribuicao temporal |
+| alerts | Alertas ativos, severidade, recomendacoes |
+
+**Exemplo**:
+```bash
+# Ver overview (default)
+/ctx-monitor:dashboard
+
+# Ver context engineering stack
+/ctx-monitor:dashboard --page stack
+
+# Ver performance de ferramentas
+/ctx-monitor:dashboard --page tools
+
+# Ver timeline de eventos
+/ctx-monitor:dashboard --page timeline
+
+# Ver alertas e recomendacoes
+/ctx-monitor:dashboard --page alerts
+
+# Ver sessao especifica
+/ctx-monitor:dashboard --session abc123 --page overview
+
+# Sem cores (para logs)
+/ctx-monitor:dashboard --no-color
+```
+
 ---
 
-## 6. Sistema de Eventos
+## 6. Dashboard Visual
 
-### 6.1 SessionStart
+O dashboard do ctx-monitor oferece visualizacao rica em Unicode para analise de sessoes de monitoramento.
+
+### 6.1 Visao Geral
+
+O dashboard e dividido em 5 paginas navegaveis, cada uma focada em um aspecto diferente da sessao:
+
+```
+ [1] Overview  [2] Stack  [3] Tools  [4] Timeline  [5] Alerts
+```
+
+### 6.2 Elementos Graficos
+
+O dashboard utiliza caracteres Unicode para visualizacoes ricas:
+
+| Elemento | Caracteres | Uso |
+|----------|------------|-----|
+| Sparklines | `▁▂▃▄▅▆▇█` | Graficos de atividade ao longo do tempo |
+| Progress | `○◔◑◕●` | Indicadores de taxa de sucesso (0%, 25%, 50%, 75%, 100%) |
+| Bar Charts | `░▒▓█` | Distribuicao de chamadas e uso de recursos |
+| Trends | `↑↓↗↘→` | Indicadores de tendencia |
+| Box Drawing | `─│┌┐└┘├┤┬┴┼` | Layout de paineis e tabelas |
+
+### 6.3 Pagina Overview
+
+A pagina overview apresenta:
+
+- **Header**: Session ID, projeto, duracao
+- **Health Score**: Porcentagem de saude da sessao (baseado em taxa de erro)
+- **Events**: Total de eventos com sparkline de atividade
+- **Errors**: Contagem e taxa de erros
+- **Token Usage**: Barra de uso com breakdown por componente
+- **Tool Activity**: Top ferramentas com sparklines e taxa de sucesso
+- **Quick Stats**: Metricas resumidas com tendencias
+
+### 6.4 Pagina Stack
+
+A pagina stack mostra o context engineering stack:
+
+- **Stack Composition**: Barra horizontal mostrando proporcao de cada componente
+- **Rules**: Arquivos de regras (CLAUDE.md, settings.json, etc.) com tokens e secoes
+- **Hooks**: Eventos configurados, disparos, erros e taxa de sucesso
+- **Skills & Agents**: Skills e agents disponiveis com uso
+
+### 6.5 Pagina Tools
+
+A pagina tools apresenta performance detalhada:
+
+- **Call Distribution**: Bar chart horizontal de chamadas por ferramenta
+- **Detailed Metrics**: Tabela com calls, success, errors, rate, tempo medio e desvio padrao
+- **Error Breakdown**: Detalhamento de erros por ferramenta e tipo
+
+### 6.6 Pagina Timeline
+
+A pagina timeline mostra o fluxo temporal:
+
+- **Event Flow**: Lista cronologica dos ultimos eventos
+- **Session Events Summary**: Distribuicao de eventos por tipo
+
+### 6.7 Pagina Alerts
+
+A pagina alerts apresenta problemas detectados:
+
+- **Active Alerts**: Lista de alertas com severidade e recomendacao
+- **Alert Severity Distribution**: Bar chart de alertas por severidade
+- **Recommendations**: Sugestoes baseadas na analise da sessao
+
+### 6.8 Calculo do Health Score
+
+O health score e calculado como:
+
+```
+Score = 100 - penalties
+
+Penalties:
+- Error rate (40% weight): errors/total_calls * 40
+- Unreliable tools (30% weight): tools com >20% erro * 10 (max 30)
+- Session completeness (20%): -10 se falta Start, -10 se falta End
+- Event pairing (10%): (1 - PostToolUse/PreToolUse) * 10
+```
+
+---
+
+## 7. Sistema de Eventos
+
+### 7.1 SessionStart
 
 Capturado quando uma nova sessao do Claude Code inicia.
 
@@ -582,7 +716,7 @@ Capturado quando uma nova sessao do Claude Code inicia.
 
 **Utilidade**: Identificar inicio de sessoes, correlacionar com ambiente de trabalho.
 
-### 6.2 SessionEnd
+### 7.2 SessionEnd
 
 Capturado quando a sessao termina.
 
@@ -599,7 +733,7 @@ Capturado quando a sessao termina.
 
 **Utilidade**: Calcular duracao de sessao, identificar terminacoes abruptas.
 
-### 6.3 PreToolUse
+### 7.3 PreToolUse
 
 Capturado imediatamente antes de uma ferramenta executar.
 
@@ -629,7 +763,7 @@ Capturado imediatamente antes de uma ferramenta executar.
 
 **Utilidade**: Saber quais ferramentas foram invocadas e com quais argumentos.
 
-### 6.4 PostToolUse
+### 7.4 PostToolUse
 
 Capturado apos uma ferramenta completar.
 
@@ -655,7 +789,7 @@ Capturado apos uma ferramenta completar.
 
 **Utilidade**: Identificar falhas, medir performance, calcular taxas de erro.
 
-### 6.5 Stop
+### 7.5 Stop
 
 Capturado quando o agente principal decide parar.
 
@@ -679,7 +813,7 @@ Capturado quando o agente principal decide parar.
 
 **Utilidade**: Entender por que o agente encerrou a execucao.
 
-### 6.6 SubagentStop
+### 7.6 SubagentStop
 
 Capturado quando um subagente (Task tool) termina.
 
@@ -697,7 +831,7 @@ Capturado quando um subagente (Task tool) termina.
 
 **Utilidade**: Rastrear ciclo de vida de subagentes, correlacionar com tarefas delegadas.
 
-### 6.7 UserPromptSubmit
+### 7.7 UserPromptSubmit
 
 Capturado quando o usuario envia um prompt.
 
@@ -716,7 +850,7 @@ Capturado quando o usuario envia um prompt.
 
 **Utilidade**: Analisar padroes de interacao, correlacionar prompts com resultados.
 
-### 6.8 PreCompact
+### 7.8 PreCompact
 
 Capturado antes da compactacao de contexto.
 
@@ -734,7 +868,7 @@ Capturado antes da compactacao de contexto.
 
 **Utilidade**: Monitorar uso de contexto, identificar sessoes com contexto pesado.
 
-### 6.9 Notification
+### 7.9 Notification
 
 Capturado quando uma notificacao e gerada.
 
@@ -760,7 +894,7 @@ Capturado quando uma notificacao e gerada.
 
 **Utilidade**: Rastrear comunicacao com usuario, identificar situacoes de alerta.
 
-### 6.10 Relacionamento entre Eventos
+### 7.10 Relacionamento entre Eventos
 
 ```
 SessionStart
@@ -789,9 +923,9 @@ SessionStart
 
 ---
 
-## 7. Analise de Traces
+## 8. Analise de Traces
 
-### 7.1 Localizacao dos Traces
+### 8.1 Localizacao dos Traces
 
 Os arquivos de trace sao armazenados em:
 
@@ -802,7 +936,7 @@ Os arquivos de trace sao armazenados em:
 └── ...
 ```
 
-### 7.2 Formato JSONL
+### 8.2 Formato JSONL
 
 Cada linha do arquivo de trace e um objeto JSON independente:
 
@@ -812,7 +946,7 @@ Cada linha do arquivo de trace e um objeto JSON independente:
 {"event_id":"e3","session_id":"s1","timestamp":"...","event_type":"PostToolUse","tool_name":"Read","status":"success"}
 ```
 
-### 7.3 Comandos de Analise Manual
+### 8.3 Comandos de Analise Manual
 
 Para analises rapidas via linha de comando:
 
@@ -843,7 +977,7 @@ cat session_abc123.jsonl | jq -s '
 '
 ```
 
-### 7.4 Indice de Sessoes
+### 8.4 Indice de Sessoes
 
 O arquivo `sessions.json` contem metadados de todas as sessoes:
 
@@ -862,11 +996,11 @@ O arquivo `sessions.json` contem metadados de todas as sessoes:
 
 ---
 
-## 8. Auditorias Modulares
+## 9. Auditorias Modulares
 
 O sistema de auditoria do ctx-monitor e composto por quatro modulos independentes, cada um focado em uma categoria especifica de problemas.
 
-### 8.1 Auditoria de Intermitencia
+### 9.1 Auditoria de Intermitencia
 
 **Objetivo**: Detectar padroes de execucao instáveis.
 
@@ -884,7 +1018,7 @@ O sistema de auditoria do ctx-monitor e composto por quatro modulos independente
 - PreToolUse sem PostToolUse correspondente
 - Multiplas sessoes curtas sequenciais
 
-### 8.2 Auditoria de Conflitos
+### 9.2 Auditoria de Conflitos
 
 **Objetivo**: Identificar configuracoes contraditorias.
 
@@ -903,7 +1037,7 @@ O sistema de auditoria do ctx-monitor e composto por quatro modulos independente
 - `CLAUDE.md`
 - Arquivos de hooks de todos os plugins
 
-### 8.3 Auditoria de Tokens
+### 9.3 Auditoria de Tokens
 
 **Objetivo**: Analisar eficiencia de uso de tokens.
 
@@ -921,7 +1055,7 @@ O sistema de auditoria do ctx-monitor e composto por quatro modulos independente
 - Tokens por sessao
 - Densidade de tokens (tokens/evento)
 
-### 8.4 Auditoria de Compliance
+### 9.4 Auditoria de Compliance
 
 **Objetivo**: Verificar conformidade de formatos e padroes.
 
@@ -941,7 +1075,7 @@ O sistema de auditoria do ctx-monitor e composto por quatro modulos independente
 - Estrutura JSON valida
 - Campos obrigatorios presentes
 
-### 8.5 Niveis de Severidade
+### 9.5 Niveis de Severidade
 
 Os resultados de auditoria sao classificados em tres niveis:
 
@@ -953,9 +1087,9 @@ Os resultados de auditoria sao classificados em tres niveis:
 
 ---
 
-## 9. Comparacao de Execucoes
+## 10. Comparacao de Execucoes
 
-### 9.1 Proposito
+### 10.1 Proposito
 
 A comparacao de traces permite identificar diferencas entre execucoes, sendo essencial para:
 
@@ -964,7 +1098,7 @@ A comparacao de traces permite identificar diferencas entre execucoes, sendo ess
 - Analise de impacto de atualizacoes
 - Estabelecimento de baselines
 
-### 9.2 Categorias de Diferenca
+### 10.2 Categorias de Diferenca
 
 | Categoria | Descricao |
 |-----------|-----------|
@@ -974,7 +1108,7 @@ A comparacao de traces permite identificar diferencas entre execucoes, sendo ess
 | Error Changes | Novos erros ou erros resolvidos |
 | Sequence Changes | Alteracoes na ordem de execucao |
 
-### 9.3 Interpretacao de Resultados
+### 10.3 Interpretacao de Resultados
 
 **Ferramentas Adicionadas**:
 - Nova funcionalidade foi implementada
@@ -994,9 +1128,9 @@ A comparacao de traces permite identificar diferencas entre execucoes, sendo ess
 
 ---
 
-## 10. Exportacao de Diagnosticos
+## 11. Exportacao de Diagnosticos
 
-### 10.1 Proposito do Bundle
+### 11.1 Proposito do Bundle
 
 O bundle de diagnostico e um pacote compactado contendo todas as informacoes necessarias para analisar problemas fora do ambiente original. Ele e util para:
 
@@ -1005,7 +1139,7 @@ O bundle de diagnostico e um pacote compactado contendo todas as informacoes nec
 - Arquivar sessoes para referencia futura
 - Analise em ambiente isolado
 
-### 10.2 Conteudo do Bundle
+### 11.2 Conteudo do Bundle
 
 ```
 ctx-monitor-bundle.zip
@@ -1017,7 +1151,7 @@ ctx-monitor-bundle.zip
 └── report.md                    # Relatorio resumido
 ```
 
-### 10.3 Processo de Anonimizacao
+### 11.3 Processo de Anonimizacao
 
 A anonimizacao e aplicada automaticamente (padrao) e remove:
 
@@ -1029,7 +1163,7 @@ A anonimizacao e aplicada automaticamente (padrao) e remove:
 | Paths de Usuario | `/Users/nome/`, `/home/nome/` | `/Users/[USER]/` |
 | IPs Internos | `10.*`, `192.168.*`, `172.16-31.*` | `[REDACTED_IP]` |
 
-### 10.4 Boas Praticas de Exportacao
+### 11.4 Boas Praticas de Exportacao
 
 1. **Sempre revise o bundle antes de compartilhar**: Mesmo com anonimizacao, verifique se nao ha dados sensiveis.
 
@@ -1041,13 +1175,13 @@ A anonimizacao e aplicada automaticamente (padrao) e remove:
 
 ---
 
-## 11. Agent trace-analyzer
+## 12. Agent trace-analyzer
 
-### 11.1 Proposito
+### 13.1 Proposito
 
 O trace-analyzer e um agente especializado em analise profunda de traces. Ele e ativado automaticamente quando o usuario solicita analise de execucao ou apos rodar `/ctx-monitor:report`.
 
-### 11.2 Ativacao
+### 13.2 Ativacao
 
 O agente e ativado por frases como:
 - "analisar traces"
@@ -1055,7 +1189,7 @@ O agente e ativado por frases como:
 - "por que ha tantos erros nos traces?"
 - "debug ctx-monitor logs"
 
-### 11.3 Processo de Analise
+### 12.3 Processo de Analise
 
 1. **Localizacao de Traces**: Busca arquivos em `.claude/ctx-monitor/traces/`
 
@@ -1071,7 +1205,7 @@ O agente e ativado por frases como:
 
 5. **Geracao de Recomendacoes**: Sugere acoes corretivas especificas
 
-### 11.4 Formato de Output
+### 12.4 Formato de Output
 
 ```markdown
 ## Trace Analysis Report
@@ -1111,7 +1245,7 @@ O agente e ativado por frases como:
 3. **Long-term**: [arquiteturais]
 ```
 
-### 11.5 Classificacao de Severidade
+### 12.5 Classificacao de Severidade
 
 | Nivel | Criterios |
 |-------|-----------|
@@ -1122,13 +1256,13 @@ O agente e ativado por frases como:
 
 ---
 
-## 12. Skill trace-interpretation
+## 13. Skill trace-interpretation
 
-### 12.1 Proposito
+### 13.1 Proposito
 
 A skill trace-interpretation fornece conhecimento especializado para interpretar traces do ctx-monitor. Ela e ativada quando o usuario precisa entender o significado dos dados capturados.
 
-### 12.2 Ativacao
+### 13.2 Ativacao
 
 Frases que ativam a skill:
 - "interpretar traces ctx-monitor"
@@ -1136,7 +1270,7 @@ Frases que ativam a skill:
 - "o que significam os eventos ctx-monitor"
 - "debugging trace output"
 
-### 12.3 Conteudo da Skill
+### 13.3 Conteudo da Skill
 
 A skill inclui:
 - Documentacao de todos os tipos de evento
@@ -1144,7 +1278,7 @@ A skill inclui:
 - Comandos jq para analise manual
 - Checklist de troubleshooting
 
-### 12.4 Referencias Bundled
+### 13.4 Referencias Bundled
 
 ```
 skills/trace-interpretation/
@@ -1156,9 +1290,9 @@ skills/trace-interpretation/
 
 ---
 
-## 13. Padroes de Falha Comuns
+## 14. Padroes de Falha Comuns
 
-### 13.1 Falhas Intermitentes
+### 14.1 Falhas Intermitentes
 
 **Descricao**: A mesma chamada de ferramenta ora funciona, ora falha.
 
@@ -1178,7 +1312,7 @@ skills/trace-interpretation/
 - Verificar status de servicos externos
 - Monitorar uso de recursos
 
-### 13.2 Hook Nao Dispara
+### 14.2 Hook Nao Dispara
 
 **Descricao**: Um hook configurado nao executa quando esperado.
 
@@ -1206,7 +1340,7 @@ cat hooks/hooks.json | jq .
 echo '{"tool_name": "Write"}' | bash hooks/scripts/event-logger.sh
 ```
 
-### 13.3 Falhas em Cascata
+### 14.3 Falhas em Cascata
 
 **Descricao**: Um erro inicial desencadeia multiplos erros subsequentes.
 
@@ -1226,7 +1360,7 @@ echo '{"tool_name": "Write"}' | bash hooks/scripts/event-logger.sh
 - Implementar mecanismos de rollback
 - Adicionar health checks entre passos
 
-### 13.4 Degradacao de Performance
+### 14.4 Degradacao de Performance
 
 **Descricao**: Tempos de execucao aumentam ao longo da sessao.
 
@@ -1246,7 +1380,7 @@ echo '{"tool_name": "Write"}' | bash hooks/scripts/event-logger.sh
 - Monitorar uso de memoria
 - Verificar limites de API
 
-### 13.5 Eventos Faltando
+### 14.5 Eventos Faltando
 
 **Descricao**: Eventos esperados nao aparecem no trace.
 
@@ -1267,7 +1401,7 @@ echo '{"tool_name": "Write"}' | bash hooks/scripts/event-logger.sh
 - Monitorar espaco em disco
 - Adicionar flush apos escritas
 
-### 13.6 Taxas de Erro Altas
+### 14.6 Taxas de Erro Altas
 
 **Descricao**: Taxa de erro de ferramenta excede 10%.
 
@@ -1289,9 +1423,9 @@ echo '{"tool_name": "Write"}' | bash hooks/scripts/event-logger.sh
 
 ---
 
-## 14. Casos de Uso Praticos
+## 15. Casos de Uso Praticos
 
-### 14.1 Debugging de Hooks que Nao Disparam
+### 15.1 Debugging de Hooks que Nao Disparam
 
 **Cenario**: Voce configurou um hook PreToolUse para validar escritas, mas ele parece nao estar funcionando.
 
@@ -1321,7 +1455,7 @@ echo '{"tool_name": "Write"}' | bash hooks/scripts/event-logger.sh
 /ctx-monitor:audit --type conflicts
 ```
 
-### 14.2 Identificacao de Regressoes
+### 15.2 Identificacao de Regressoes
 
 **Cenario**: Apos atualizar um plugin, usuarios reportam comportamento diferente.
 
@@ -1348,7 +1482,7 @@ echo '{"tool_name": "Write"}' | bash hooks/scripts/event-logger.sh
    - Mudancas em taxa de erro
    - Alteracoes de sequencia
 
-### 14.3 Auditoria de Compliance
+### 15.3 Auditoria de Compliance
 
 **Cenario**: Voce precisa garantir que as execucoes seguem padroes estabelecidos.
 
@@ -1377,7 +1511,7 @@ echo '{"tool_name": "Write"}' | bash hooks/scripts/event-logger.sh
 /ctx-monitor:export-bundle --output ./audit-2024-01.zip
 ```
 
-### 14.4 Investigacao de Performance
+### 15.4 Investigacao de Performance
 
 **Cenario**: Sessoes estao demorando mais que o esperado.
 
@@ -1406,7 +1540,7 @@ echo '{"tool_name": "Write"}' | bash hooks/scripts/event-logger.sh
 Analisar traces para problemas de performance
 ```
 
-### 14.5 Compartilhamento com Suporte
+### 15.5 Compartilhamento com Suporte
 
 **Cenario**: Voce encontrou um bug e precisa reportar para a equipe de suporte.
 
@@ -1438,9 +1572,9 @@ Analisar traces para problemas de performance
 
 ---
 
-## 15. Resolucao de Problemas
+## 16. Resolucao de Problemas
 
-### 15.1 Monitoramento Nao Inicia
+### 16.1 Monitoramento Nao Inicia
 
 **Sintomas**:
 - Comando `/ctx-monitor:start` nao produz efeito
@@ -1465,7 +1599,7 @@ ls -la .claude/ctx-monitor/traces/
 
 4. Reinicie o Claude Code para recarregar hooks
 
-### 15.2 Traces Vazios ou Incompletos
+### 16.2 Traces Vazios ou Incompletos
 
 **Sintomas**:
 - Arquivo de trace existe mas esta vazio
@@ -1490,7 +1624,7 @@ echo '{"event_type":"test"}' | bash plugins/ctx-monitor/hooks/scripts/event-logg
 
 4. Verifique permissoes de escrita no diretorio
 
-### 15.3 Erros nos Scripts Python
+### 16.3 Erros nos Scripts Python
 
 **Sintomas**:
 - Comandos report, audit, diff falham
@@ -1510,7 +1644,7 @@ python3 --version
 python3 scripts/log-parser.py --help
 ```
 
-### 15.4 Bundle Nao Exporta
+### 16.4 Bundle Nao Exporta
 
 **Sintomas**:
 - Comando export-bundle falha
@@ -1527,7 +1661,7 @@ python3 scripts/log-parser.py --help
 ls .claude/ctx-monitor/traces/
 ```
 
-### 15.5 Auditoria Retorna Falsos Positivos
+### 16.5 Auditoria Retorna Falsos Positivos
 
 **Sintomas**:
 - Auditoria reporta problemas que nao existem
@@ -1543,9 +1677,9 @@ ls .claude/ctx-monitor/traces/
 
 ---
 
-## 16. Referencia Tecnica
+## 17. Referencia Tecnica
 
-### 16.1 Variaveis de Ambiente
+### 17.1 Variaveis de Ambiente
 
 | Variavel | Descricao |
 |----------|-----------|
@@ -1553,7 +1687,7 @@ ls .claude/ctx-monitor/traces/
 | CLAUDE_PROJECT_DIR | Diretorio raiz do projeto |
 | CLAUDE_ENV_FILE | Arquivo para persistir env vars (SessionStart) |
 
-### 16.2 Exit Codes dos Scripts
+### 17.2 Exit Codes dos Scripts
 
 | Codigo | Significado |
 |--------|-------------|
@@ -1561,7 +1695,7 @@ ls .claude/ctx-monitor/traces/
 | 1 | Problemas criticos detectados |
 | 2 | Erro de execucao do script |
 
-### 16.3 Formatos de Saida
+### 17.3 Formatos de Saida
 
 | Formato | Extensao | Uso |
 |---------|----------|-----|
@@ -1569,7 +1703,7 @@ ls .claude/ctx-monitor/traces/
 | json | .json | Integracao programatica |
 | md | .md | Documentacao, sharing |
 
-### 16.4 Limites e Restricoes
+### 17.4 Limites e Restricoes
 
 | Parametro | Limite | Nota |
 |-----------|--------|------|
@@ -1578,7 +1712,7 @@ ls .claude/ctx-monitor/traces/
 | Retencao padrao | 30 dias | Configuravel |
 | Sessoes maximas | 100 | Configuravel |
 
-### 16.5 Dependencias
+### 17.5 Dependencias
 
 | Dependencia | Versao Minima | Proposito |
 |-------------|---------------|-----------|
