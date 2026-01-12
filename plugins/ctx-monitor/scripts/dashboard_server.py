@@ -410,6 +410,10 @@ def get_embedded_frontend() -> str:
             --brand-white: #FFFFFF;
             --brand-light-gray: #F4F7F6;
 
+            /* Logo colors - adapt to theme */
+            --logo-shield: var(--brand-deep-slate);
+            --logo-pulse: var(--brand-audit-blue);
+
             /* Theme Colors */
             --bg-primary: var(--brand-light-gray);
             --bg-secondary: var(--brand-white);
@@ -438,6 +442,7 @@ def get_embedded_frontend() -> str:
         .dark {
             --bg-primary: #1A252F;
             --bg-secondary: var(--brand-deep-slate);
+            --logo-shield: var(--brand-white);
             --bg-tertiary: #34495E;
             --text-primary: var(--brand-white);
             --text-secondary: #BDC3C7;
@@ -1036,8 +1041,8 @@ def get_embedded_frontend() -> str:
             // Audit Shield Logo - ctx-monitor brand identity
             AuditShield: ({ size = 38 }) => (
                 <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-                    <path d="M50 12L88 28V55C88 77.5 50 88 50 88C50 88 12 77.5 12 55V28L50 12Z" stroke="var(--brand-deep-slate)" strokeWidth="5" strokeLinejoin="round"/>
-                    <path d="M28 50H41L47 38L53 62L59 50H72" stroke="var(--brand-audit-blue)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M50 12L88 28V55C88 77.5 50 88 50 88C50 88 12 77.5 12 55V28L50 12Z" stroke="var(--logo-shield)" strokeWidth="5" strokeLinejoin="round"/>
+                    <path d="M28 50H41L47 38L53 62L59 50H72" stroke="var(--logo-pulse)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
             ),
             Menu: () => (
