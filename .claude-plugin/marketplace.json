@@ -1,7 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "dutt-plugins-official",
-  "version": "0.3.3",
   "description": "Official Dutt Yeshua Technology plugins marketplace",
   "owner": {
     "name": "Murillo Dutt",
@@ -10,14 +9,12 @@
   "plugins": [
     {
       "name": "ctx-monitor",
-      "version": "0.3.3",
       "description": "Observability and auditing plugin for Claude Code CLI context engineering",
-      "author": {
-        "name": "Murillo Dutt",
-        "email": "murillo@duttyeshua.com"
-      },
-      "source": "./plugins/ctx-monitor",
       "category": "development",
+      "source": {
+        "type": "url",
+        "url": "https://github.com/murillodutt/ctx-monitor.git"
+      },
       "homepage": "https://github.com/murillodutt/ctx-monitor"
     }
   ]
