@@ -3,7 +3,7 @@
 Manual completo para desenvolvimento de plugins para Claude Code CLI.
 
 **Baseado em:** claude-plugins-official (Anthropic) + plugin-dev oficial
-**Versao:** 0.3.5
+**Versao:** 0.3.6
 **Ultima atualizacao:** 2026-01-12
 
 ---
@@ -79,7 +79,7 @@ Na pasta `.claude-plugin/` da **raiz do repositorio**:
 - marketplace.json - DEVE existir
 - plugin.json - NAO deve existir aqui!
 
-### marketplace.json
+### marketplace.json (Formato Testado e Funcionando)
 
 ```json
 {
@@ -100,13 +100,13 @@ Na pasta `.claude-plugin/` da **raiz do repositorio**:
         "email": "email@exemplo.com"
       },
       "source": "./plugins/seu-plugin",
-      "category": "development",
-      "homepage": "https://github.com/user/repo",
-      "tags": ["community-managed"]
+      "category": "development"
     }
   ]
 }
 ```
+
+> **IMPORTANTE:** Este e o formato exato que funciona no gerenciador de plugins do Claude Code CLI. Testado e validado.
 
 ### Referencia de Campos do marketplace.json
 
@@ -127,20 +127,16 @@ Na pasta `.claude-plugin/` da **raiz do repositorio**:
 | `name` | **Sim** | string | Nome do dono/organizacao |
 | `email` | **Sim** | string | Email de contato |
 
-#### Campos de Entrada de Plugin
+#### Campos de Entrada de Plugin (no marketplace.json)
 
 | Campo | Obrigatorio | Tipo | Descricao |
 |-------|-------------|------|-----------|
 | `name` | **Sim** | string | Identificador do plugin (kebab-case) |
 | `description` | **Sim** | string | Visao geral da funcionalidade do plugin |
 | `author` | **Sim** | object | Criador do plugin (name, email) |
-| `source` | **Sim** | string/object | Localizacao do plugin (caminho ou objeto URL) |
+| `source` | **Sim** | string | Localizacao do plugin (caminho relativo) |
 | `category` | **Sim** | string | Categoria de classificacao |
 | `version` | Nao | string | Versao semantica (ex: "1.0.0") |
-| `homepage` | Nao | string | URL da homepage/repositorio do projeto |
-| `tags` | Nao | array | Labels (ex: "community-managed") |
-| `strict` | Nao | boolean | Flag de rigidez |
-| `lspServers` | Nao | object | Configuracao de Language Server Protocol |
 
 #### Categorias Disponiveis
 
@@ -154,38 +150,6 @@ Na pasta `.claude-plugin/` da **raiz do repositorio**:
 - `deployment` - Automacao de deploy
 - `monitoring` - Monitoramento e observabilidade
 
-#### Formatos de Source
-
-**Referencia de caminho (recomendado para plugins internos):**
-```json
-"source": "./plugins/seu-plugin"
-```
-
-**Objeto URL (para repositorios externos):**
-```json
-"source": {
-  "source": "url",
-  "url": "https://github.com/user/repo.git"
-}
-```
-
-#### Configuracao de LSP Server (Opcional)
-
-Para plugins que fornecem integracao com Language Server Protocol:
-
-```json
-"lspServers": {
-  "server-name": {
-    "command": "nome-executavel",
-    "args": ["--arg1", "--arg2"],
-    "extensionToLanguage": {
-      ".ext": "language-id"
-    },
-    "startupTimeout": 5000
-  }
-}
-```
-
 ---
 
 ## 3. Estrutura de Plugin
@@ -198,7 +162,6 @@ Baseado no example-plugin e plugin-dev oficiais da Anthropic.
 plugin-name/
 ├── .claude-plugin/
 │   └── plugin.json        # Plugin metadata (REQUIRED)
-├── .mcp.json              # MCP server configuration (optional)
 ├── commands/              # Slash commands (optional)
 │   └── command-name.md
 ├── agents/                # Agent definitions (optional)
@@ -223,7 +186,7 @@ plugin-name/
 3. **Componentes opcionais**: Criar apenas diretorios para componentes que o plugin usa
 4. **Convencao de nomes**: Usar kebab-case para todos os diretorios e arquivos
 
-### plugin.json
+### plugin.json (Formato Testado e Funcionando)
 
 Localizacao: `.claude-plugin/plugin.json`
 
@@ -240,7 +203,7 @@ Localizacao: `.claude-plugin/plugin.json`
 }
 ```
 
-#### Exemplo Estendido (Com Campos Opcionais)
+#### Exemplo Completo (Formato Testado e Funcionando)
 
 ```json
 {
@@ -253,6 +216,8 @@ Localizacao: `.claude-plugin/plugin.json`
   }
 }
 ```
+
+> **IMPORTANTE:** Este e o formato exato que funciona no gerenciador de plugins do Claude Code CLI. Testado e validado.
 
 ### Referencia de Campos do plugin.json
 
@@ -270,7 +235,34 @@ Localizacao: `.claude-plugin/plugin.json`
 | `name` | **Sim** | string | Nome do autor/organizacao |
 | `email` | **Sim** | string | Email de contato |
 
-> **Nota:** Os plugins oficiais da Anthropic usam apenas `name`, `description` e `author`. O campo `version` e opcional mas recomendado para rastreamento de releases.
+### Referencia de Campos Validos
+
+O validador de plugins **rejeita** qualquer campo nao reconhecido no plugin.json.
+
+**Campos obrigatorios:**
+- `name` - Identificador do plugin (kebab-case)
+- `description` - Descricao breve
+- `author` - Objeto com `name` e `email`
+
+**Campos opcionais:**
+- `version` - Versao semantica (ex: "1.0.0")
+- `repository` - URL do repositorio
+- `keywords` - Array de palavras-chave
+- `license` - Identificador de licenca (ex: "MIT")
+- `hooks` - Caminho para arquivo de configuracao de hooks (ex: "./hooks/hooks.json")
+
+**Campos INVALIDOS (NAO use):**
+- `components` - NAO EXISTE no schema
+- `commands` (como lista) - NAO liste, sao auto-descobertos
+- `agents` (como lista) - NAO liste, sao auto-descobertos
+- `skills` (como lista) - NAO liste, sao auto-descobertos
+
+**Erro comum:**
+```
+Plugin has an invalid manifest file. Validation errors: : Unrecognized key: "components"
+```
+
+**Auto-descoberta:** Os diretorios `commands/`, `agents/`, `skills/`, `hooks/` na raiz do plugin sao descobertos automaticamente. NAO e necessario lista-los no manifest.
 
 ### Comportamento de Namespace
 
@@ -945,6 +937,19 @@ Skills usam um sistema de carregamento de tres niveis para gerenciar contexto ef
 - Verificar `marketplace.json` segue padrao oficial
 - Remover `plugin.json` da raiz do marketplace
 
+### Unrecognized key
+
+**Sintoma:** `Plugin has an invalid manifest file. Validation errors: : Unrecognized key: "components"`
+
+**Causa:** Campo invalido no plugin.json (ex: `components`, `repository`, `keywords`, `hooks`)
+
+**Solucao:**
+1. Remover campos nao reconhecidos do plugin.json
+2. Campos validos: **APENAS** `name`, `description`, `author`, `version`
+3. NAO usar: `components`, `repository`, `keywords`, `license`, `hooks`
+4. NAO listar comandos/agents/skills - eles sao auto-descobertos
+5. Validar com: `claude plugin validate ./path/to/plugin`
+
 ### Plugin Nao Aparece
 
 **Solucoes:**
@@ -1001,6 +1006,12 @@ Skills usam um sistema de carregamento de tres niveis para gerenciar contexto ef
 - [ ] Skills com `name` e `description` no frontmatter (terceira pessoa)
 - [ ] Agents com `name`, `description`, `model`, `color`
 - [ ] Hooks usam formato wrapper `{"hooks": {...}}`
+
+### plugin.json
+
+- [ ] Contem apenas: `name`, `description`, `author`, `version`
+- [ ] NAO contem: `components`, `repository`, `keywords`, `license`, `hooks`
+- [ ] Validado com: `claude plugin validate ./path/to/plugin`
 
 ### Skills
 

@@ -928,7 +928,8 @@ class MetricsCollector:
         return errors[:10]  # Limit to 10 most recent
 
     def get_alerts(self) -> List[Dict[str, Any]]:
-        """Generate alerts based on metrics analysis."""
+        """Generate alerts based on metrics analysis with full context."""
+        import uuid
         alerts = []
         tool_metrics = self.get_tool_metrics()
 
@@ -936,39 +937,98 @@ class MetricsCollector:
         for tool in tool_metrics:
             if tool["calls"] > 0:
                 error_rate = (tool["errors"] / tool["calls"]) * 100
-                if error_rate >= 50:
+                if error_rate >= 10:
+                    # Find error events for this tool
+                    error_events = [
+                        e for e in self.events
+                        if e.get("tool_name") == tool["tool"]
+                        and e.get("status") == "error"
+                    ]
+                    error_events.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
+
+                    # Build related events list
+                    related = []
+                    for ev in error_events[:5]:
+                        related.append({
+                            "event_id": ev.get("event_id", "")[:8],
+                            "timestamp": ev.get("timestamp", "")[-12:-5] if ev.get("timestamp") else "",
+                            "event_type": ev.get("event_type", ""),
+                            "tool_name": ev.get("tool_name", ""),
+                            "args_preview": (ev.get("args_preview", "") or "")[:50],
+                            "error_message": (ev.get("error_message", "") or ev.get("result_preview", "") or "")[:100]
+                        })
+
+                    # Determine severity
+                    if error_rate >= 50:
+                        severity = "CRITICAL"
+                        recommendation = "Critical failure rate. Possible causes:\n• Context window exceeded\n• Invalid file paths or permissions\n• Tool timeout or crash"
+                    elif error_rate >= 20:
+                        severity = "HIGH"
+                        recommendation = "High failure rate. Possible causes:\n• Intermittent permission issues\n• File not found errors\n• Network timeouts"
+                    else:
+                        severity = "MEDIUM"
+                        recommendation = "Moderate failure rate. Monitor for patterns."
+
                     alerts.append({
-                        "severity": "CRITICAL",
-                        "indicator": "○",
+                        "id": str(uuid.uuid4())[:8],
+                        "severity": severity,
+                        "type": "high_error_rate",
                         "message": f"Tool '{tool['tool']}' has {error_rate:.0f}% failure rate ({tool['errors']}/{tool['calls']} calls)",
-                        "recommendation": "Check context limits, reduce payload size"
-                    })
-                elif error_rate >= 20:
-                    alerts.append({
-                        "severity": "HIGH",
-                        "indicator": "◔",
-                        "message": f"Tool '{tool['tool']}' has {error_rate:.0f}% failure rate ({tool['errors']}/{tool['calls']} calls)",
-                        "recommendation": "Verify file permissions and paths"
-                    })
-                elif error_rate >= 10:
-                    alerts.append({
-                        "severity": "MEDIUM",
-                        "indicator": "◑",
-                        "message": f"Tool '{tool['tool']}' has {error_rate:.0f}% failure rate",
-                        "recommendation": "Monitor for patterns"
+                        "recommendation": recommendation,
+                        "action_command": f"/ctx-monitor:audit --type intermittency",
+                        "related_events": related,
+                        "first_occurrence": error_events[-1].get("timestamp", "")[-12:-5] if error_events else "",
+                        "last_occurrence": error_events[0].get("timestamp", "")[-12:-5] if error_events else "",
+                        "occurrences_count": len(error_events),
+                        "tool_name": tool["tool"],
+                        "error_rate": round(error_rate, 1)
                     })
 
         # Check for unpaired events
-        pre_count = sum(1 for e in self.events if e.get("event_type") == "PreToolUse")
-        post_count = sum(1 for e in self.events if e.get("event_type") == "PostToolUse")
-        unpaired = abs(pre_count - post_count)
+        pre_events = [e for e in self.events if e.get("event_type") == "PreToolUse"]
+        post_events = [e for e in self.events if e.get("event_type") == "PostToolUse"]
+
+        # Find PreToolUse events without matching PostToolUse
+        post_ids = {e.get("event_id") for e in post_events}
+        unpaired_events = []
+        for pre in pre_events:
+            # Simple heuristic: check if there's a PostToolUse with same tool shortly after
+            pre_ts = pre.get("timestamp", "")
+            pre_tool = pre.get("tool_name", "")
+            has_match = any(
+                p.get("tool_name") == pre_tool and p.get("timestamp", "") > pre_ts
+                for p in post_events
+            )
+            if not has_match:
+                unpaired_events.append(pre)
+
+        unpaired = len(unpaired_events)
 
         if unpaired > 0:
+            unpaired_events.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
+
+            related = []
+            for ev in unpaired_events[:5]:
+                related.append({
+                    "event_id": ev.get("event_id", "")[:8],
+                    "timestamp": ev.get("timestamp", "")[-12:-5] if ev.get("timestamp") else "",
+                    "event_type": ev.get("event_type", ""),
+                    "tool_name": ev.get("tool_name", ""),
+                    "args_preview": (ev.get("args_preview", "") or "")[:50],
+                    "error_message": ""
+                })
+
             alerts.append({
+                "id": str(uuid.uuid4())[:8],
                 "severity": "HIGH" if unpaired > 5 else "MEDIUM",
-                "indicator": "◔" if unpaired > 5 else "◑",
+                "type": "unpaired_events",
                 "message": f"{unpaired} PreToolUse events without matching PostToolUse",
-                "recommendation": "Investigate hook execution failures"
+                "recommendation": "These events lack PostToolUse responses. Possible causes:\n• Tool execution was interrupted\n• Hook failed to capture PostToolUse event\n• Tool timed out before completing",
+                "action_command": "/ctx-monitor:audit --type intermittency",
+                "related_events": related,
+                "first_occurrence": unpaired_events[-1].get("timestamp", "")[-12:-5] if unpaired_events else "",
+                "last_occurrence": unpaired_events[0].get("timestamp", "")[-12:-5] if unpaired_events else "",
+                "occurrences_count": unpaired
             })
 
         return alerts

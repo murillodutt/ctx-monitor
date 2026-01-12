@@ -123,6 +123,11 @@ class DashboardAPI:
                 "used": total_used,
                 "available": total_available,
                 "percentage": round(total_used / total_available * 100, 1),
+                "ctx_monitor": (
+                    stack_summary["hooks"].get("tokens", 50) +
+                    stack_summary["skills"]["total_tokens"] +
+                    stack_summary["agents"]["total_tokens"]
+                ),
                 "breakdown": {
                     "rules": stack_summary["rules"]["total_tokens"],
                     "hooks": stack_summary["hooks"].get("tokens", 50),
@@ -505,12 +510,18 @@ def get_embedded_frontend() -> str:
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 24px;
+            padding: clamp(12px, 2vw, 18px) clamp(14px, 3vw, 26px);
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
+            backdrop-filter: blur(8px);
+            background: rgba(var(--bg-secondary-rgb, 255, 255, 255), 0.95);
+        }
+
+        .dark .header {
+            background: rgba(44, 62, 80, 0.95);
         }
 
         .logo {
@@ -651,61 +662,98 @@ def get_embedded_frontend() -> str:
         }
 
         .theme-toggle {
-            padding: 8px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
+            padding: 6px;
+            background: transparent;
+            border: none;
             color: var(--text-secondary);
             cursor: pointer;
-            font-size: 14px;
-            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease, transform 0.3s ease;
         }
 
         .theme-toggle:hover {
-            color: var(--text-primary);
-            border-color: var(--border-strong);
+            color: var(--accent-primary);
+            transform: rotate(15deg);
+        }
+
+        .theme-toggle:active {
+            transform: rotate(360deg);
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .theme-toggle:hover svg {
+            transform: scale(1.15);
         }
 
         .main {
             flex: 1;
-            padding: 24px;
-            max-width: 1400px;
+            padding: clamp(12px, 3vw, 28px);
+            max-width: 1500px;
             margin: 0 auto;
             width: 100%;
         }
 
-        /* Cards */
+        @media (max-width: 600px) {
+            .main {
+                padding: 10px;
+            }
+        }
+
+        /* Cards - Enhanced */
         .card {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             overflow: hidden;
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--border-strong);
         }
 
         .card-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 20px;
+            padding: clamp(12px, 2vw, 18px) clamp(14px, 2.5vw, 22px);
             border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(180deg, var(--bg-secondary), var(--bg-tertiary));
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .card-title {
-            font-size: 12px;
+            font-size: clamp(10px, 1.5vw, 12px);
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
             color: var(--text-secondary);
         }
 
         .card-body {
-            padding: 20px;
+            padding: clamp(14px, 2.5vw, 22px);
         }
 
-        /* Grid */
+        @media (max-width: 600px) {
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Grid - Enhanced Responsive */
         .grid {
             display: grid;
-            gap: 20px;
+            gap: 16px;
         }
 
         .grid-2 { grid-template-columns: repeat(2, 1fr); }
@@ -713,119 +761,249 @@ def get_embedded_frontend() -> str:
         .grid-4 { grid-template-columns: repeat(4, 1fr); }
         .grid-5 { grid-template-columns: repeat(5, 1fr); }
 
+        @media (max-width: 1400px) {
+            .grid-5 { grid-template-columns: repeat(5, 1fr); }
+            .grid { gap: 14px; }
+        }
+
         @media (max-width: 1200px) {
             .grid-5 { grid-template-columns: repeat(3, 1fr); }
             .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .grid-3 { grid-template-columns: repeat(3, 1fr); }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
+            .grid-5 { grid-template-columns: repeat(2, 1fr); }
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+            .grid { gap: 12px; }
+        }
+
+        @media (max-width: 600px) {
             .grid-5, .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+            .grid { gap: 10px; }
         }
 
-        /* Metrics */
+        /* Metrics - Enhanced KPI Cards */
         .metric-card {
             text-align: center;
-            padding: 20px;
+            padding: clamp(16px, 3vw, 24px);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .metric-card.dual {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .dual-metric {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .dual-metric .metric-value {
+            font-size: clamp(16px, 2.5vw, 22px);
+        }
+
+        .dual-metric .metric-label {
+            font-size: 10px;
+        }
+
+        .metric-divider {
+            width: 60%;
+            height: 1px;
+            background: var(--border-color);
+            margin: 4px auto;
         }
 
         .metric-value {
-            font-size: 32px;
+            font-size: clamp(24px, 5vw, 36px);
             font-weight: 700;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            line-height: 1.1;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
         }
 
         .metric-label {
-            font-size: 11px;
+            font-size: clamp(9px, 1.5vw, 11px);
             color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 500;
+        }
+
+        .metric-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .metric-status {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 9999px;
-            font-size: 10px;
-            font-weight: 600;
-            margin-top: 8px;
+        .status-ok { 
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.15), rgba(39, 174, 96, 0.05)); 
+            color: var(--success);
+            box-shadow: 0 0 0 1px rgba(39, 174, 96, 0.2);
+        }
+        .status-warn { 
+            background: linear-gradient(135deg, rgba(243, 156, 18, 0.15), rgba(243, 156, 18, 0.05)); 
+            color: var(--warning);
+            box-shadow: 0 0 0 1px rgba(243, 156, 18, 0.2);
+        }
+        .status-alert { 
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.15), rgba(231, 76, 60, 0.05)); 
+            color: var(--error);
+            box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2);
         }
 
-        .status-ok { background: rgba(34, 197, 94, 0.1); color: var(--success); }
-        .status-warn { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .status-alert { background: rgba(239, 68, 68, 0.1); color: var(--error); }
-
-        /* Sparkline */
+        /* Sparkline - Enhanced */
         .sparkline {
             display: flex;
             align-items: flex-end;
-            gap: 1px;
-            height: 24px;
+            gap: 2px;
+            height: clamp(20px, 4vw, 32px);
+            padding: 4px 0;
         }
 
         .sparkline-bar {
             flex: 1;
-            background: var(--accent-primary);
-            border-radius: 1px;
-            min-width: 3px;
-            transition: height 0.3s ease;
+            background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 2px;
+            min-width: 4px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.85;
         }
 
-        /* Progress */
+        .sparkline-bar:hover {
+            opacity: 1;
+            transform: scaleY(1.1);
+            transform-origin: bottom;
+        }
+
+        /* Progress - Enhanced */
         .progress {
-            height: 8px;
+            height: 10px;
             background: var(--bg-tertiary);
-            border-radius: 4px;
+            border-radius: 5px;
             overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
         }
 
         .progress-fill {
             height: 100%;
-            background: var(--accent-primary);
-            transition: width 0.3s ease;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 5px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
 
-        /* Table */
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Table - Enhanced Responsive */
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: -4px;
+            padding: 4px;
+        }
+
         .table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 500px;
         }
 
         .table th, .table td {
-            padding: 12px 16px;
+            padding: clamp(8px, 2vw, 14px) clamp(10px, 2vw, 16px);
             text-align: left;
             border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
         }
 
         .table th {
-            font-size: 11px;
+            font-size: clamp(9px, 1.5vw, 11px);
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: var(--text-secondary);
             background: var(--bg-tertiary);
+            position: sticky;
+            top: 0;
+            z-index: 1;
         }
 
         .table tr:last-child td {
             border-bottom: none;
         }
 
+        .table tr {
+            transition: background 0.15s ease;
+        }
+
         .table tr:hover td {
             background: var(--bg-tertiary);
         }
 
-        /* Event Stream */
+        @media (max-width: 600px) {
+            .table {
+                min-width: 400px;
+            }
+            .table th, .table td {
+                padding: 8px 10px;
+                font-size: 11px;
+            }
+        }
+
+        /* Event Stream - Enhanced */
         .event-stream {
-            max-height: 400px;
+            max-height: clamp(300px, 50vh, 450px);
             overflow-y: auto;
         }
 
         .event-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 10px 16px;
+            gap: clamp(8px, 2vw, 14px);
+            padding: clamp(8px, 2vw, 12px) clamp(12px, 2vw, 18px);
             border-bottom: 1px solid var(--border-color);
-            font-size: 12px;
+            font-size: clamp(11px, 1.8vw, 13px);
+            transition: background 0.15s ease;
+        }
+
+        .event-item:hover {
+            background: var(--bg-tertiary);
         }
 
         .event-item:last-child {
@@ -835,34 +1013,69 @@ def get_embedded_frontend() -> str:
         .event-time {
             color: var(--text-muted);
             font-variant-numeric: tabular-nums;
+            font-size: clamp(10px, 1.5vw, 12px);
+            min-width: fit-content;
         }
 
         .event-type {
-            padding: 2px 8px;
+            padding: 3px 10px;
             background: var(--bg-tertiary);
             border-radius: var(--radius-sm);
             font-weight: 500;
+            font-size: clamp(10px, 1.5vw, 12px);
+            white-space: nowrap;
         }
 
         .event-tool {
             color: var(--accent-primary);
-            font-weight: 500;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: clamp(80px, 20vw, 150px);
         }
 
         .event-status {
             margin-left: auto;
+            display: flex;
+            align-items: center;
         }
 
         .event-status.success { color: var(--success); }
         .event-status.error { color: var(--error); }
         .event-status.pending { color: var(--text-muted); }
 
-        /* Alerts */
+        @media (max-width: 500px) {
+            .event-item {
+                flex-wrap: wrap;
+            }
+            .event-time {
+                order: 1;
+                flex-basis: 100%;
+                margin-bottom: 4px;
+            }
+            .event-type {
+                order: 2;
+            }
+            .event-tool {
+                order: 3;
+            }
+            .event-status {
+                order: 4;
+            }
+        }
+
+        /* Alerts - Enhanced */
         .alert-item {
             display: flex;
-            gap: 12px;
-            padding: 16px;
+            gap: clamp(10px, 2vw, 14px);
+            padding: clamp(12px, 2vw, 18px);
             border-bottom: 1px solid var(--border-color);
+            transition: background 0.15s ease;
+        }
+
+        .alert-item:hover {
+            background: var(--bg-tertiary);
         }
 
         .alert-item:last-child {
@@ -870,36 +1083,196 @@ def get_embedded_frontend() -> str:
         }
 
         .alert-indicator {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            margin-top: 6px;
+            margin-top: 5px;
             flex-shrink: 0;
+            animation: pulse-alert 2s infinite;
         }
 
-        .alert-indicator.critical { background: var(--error); }
-        .alert-indicator.high { background: #F97316; }
+        @keyframes pulse-alert {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.9); }
+        }
+
+        .alert-indicator.critical { background: var(--error); box-shadow: 0 0 8px var(--error); }
+        .alert-indicator.high { background: #F97316; box-shadow: 0 0 6px #F97316; }
         .alert-indicator.medium { background: var(--warning); }
         .alert-indicator.low { background: var(--info); }
-        .alert-indicator.info { background: var(--text-muted); }
+        .alert-indicator.info { background: var(--text-muted); animation: none; }
 
-        .alert-content { flex: 1; }
+        .alert-content { flex: 1; min-width: 0; }
 
         .alert-severity {
-            font-size: 11px;
-            font-weight: 600;
+            font-size: clamp(10px, 1.5vw, 11px);
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
         }
 
         .alert-message {
             color: var(--text-primary);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            font-size: clamp(12px, 1.8vw, 14px);
+            line-height: 1.4;
         }
 
         .alert-recommendation {
+            font-size: clamp(11px, 1.6vw, 13px);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        /* Expandable Alerts */
+        .alert-item.expandable {
+            cursor: pointer;
+            flex-direction: column;
+        }
+
+        .alert-header {
+            display: flex;
+            gap: clamp(10px, 2vw, 14px);
+            width: 100%;
+            align-items: flex-start;
+        }
+
+        .alert-expand-btn {
+            margin-left: auto;
+            padding: 4px 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .alert-expand-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        .alert-details {
+            display: none;
+            width: 100%;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .alert-item.expanded .alert-details {
+            display: block;
+        }
+
+        .alert-section {
+            margin-bottom: 16px;
+        }
+
+        .alert-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .alert-section-title {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .alert-events {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .alert-event {
+            display: grid;
+            grid-template-columns: 70px 90px 60px 1fr;
+            gap: 8px;
+            padding: 8px 12px;
             font-size: 12px;
+            font-family: var(--font-mono);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .alert-event:last-child {
+            border-bottom: none;
+        }
+
+        .alert-event-time {
+            color: var(--text-muted);
+        }
+
+        .alert-event-type {
+            color: var(--accent-primary);
+        }
+
+        .alert-event-tool {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .alert-event-args {
+            color: var(--text-muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .alert-timeline {
+            display: flex;
+            gap: 24px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .alert-timeline-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .alert-timeline-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .alert-timeline-value {
+            font-family: var(--font-mono);
+            font-weight: 500;
+        }
+
+        .alert-action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .alert-action code {
+            font-family: var(--font-mono);
+            background: var(--bg-secondary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: var(--accent-primary);
+        }
+
+        .alert-causes {
+            white-space: pre-line;
+            font-size: 12px;
+            line-height: 1.6;
             color: var(--text-secondary);
         }
 
@@ -946,67 +1319,113 @@ def get_embedded_frontend() -> str:
             margin-bottom: 8px;
         }
 
-        /* Bar Chart */
+        /* Bar Chart - Enhanced */
         .bar-chart {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: clamp(10px, 2vw, 14px);
         }
 
         .bar-row {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: clamp(8px, 2vw, 14px);
+            transition: transform 0.15s ease;
+        }
+
+        .bar-row:hover {
+            transform: translateX(4px);
         }
 
         .bar-label {
-            width: 80px;
-            font-weight: 500;
-            font-size: 12px;
+            width: clamp(60px, 12vw, 90px);
+            font-weight: 600;
+            font-size: clamp(11px, 1.8vw, 13px);
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .bar-track {
             flex: 1;
-            height: 20px;
+            height: clamp(18px, 3vw, 24px);
             background: var(--bg-tertiary);
-            border-radius: var(--radius-sm);
+            border-radius: var(--radius-md);
             overflow: hidden;
             display: flex;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .bar-success {
-            background: var(--success);
+            background: linear-gradient(90deg, var(--success), #2ECC71);
             height: 100%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
         }
 
         .bar-error {
-            background: var(--error);
+            background: linear-gradient(90deg, var(--error), #C0392B);
             height: 100%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .bar-value {
-            width: 50px;
+            width: clamp(40px, 8vw, 55px);
             text-align: right;
-            font-size: 12px;
+            font-size: clamp(11px, 1.8vw, 13px);
             color: var(--text-secondary);
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
         }
 
-        /* Rate Circle */
+        @media (max-width: 600px) {
+            .bar-label {
+                width: 50px;
+            }
+            .bar-value {
+                width: 35px;
+            }
+        }
+
+        /* Rate Circle - Enhanced */
         .rate-circle {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 48px;
-            height: 48px;
+            width: clamp(40px, 8vw, 52px);
+            height: clamp(40px, 8vw, 52px);
             border-radius: 50%;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: clamp(10px, 1.8vw, 13px);
+            font-weight: 700;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-variant-numeric: tabular-nums;
         }
 
-        .rate-excellent { background: rgba(34, 197, 94, 0.15); color: var(--success); }
-        .rate-good { background: rgba(59, 130, 246, 0.15); color: var(--info); }
-        .rate-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
-        .rate-poor { background: rgba(239, 68, 68, 0.15); color: var(--error); }
+        .rate-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .rate-excellent { 
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.2), rgba(39, 174, 96, 0.05)); 
+            color: var(--success);
+            box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.15);
+        }
+        .rate-good { 
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.2), rgba(52, 152, 219, 0.05)); 
+            color: var(--info);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.15);
+        }
+        .rate-warning { 
+            background: linear-gradient(135deg, rgba(243, 156, 18, 0.2), rgba(243, 156, 18, 0.05)); 
+            color: var(--warning);
+            box-shadow: 0 0 0 2px rgba(243, 156, 18, 0.15);
+        }
+        .rate-poor { 
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.2), rgba(231, 76, 60, 0.05)); 
+            color: var(--error);
+            box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.15);
+        }
 
         /* Footer */
         .footer {
@@ -1097,6 +1516,25 @@ def get_embedded_frontend() -> str:
             )
         };
 
+        // Helper: Format duration in seconds to human readable
+        function formatDuration(seconds) {
+            if (!seconds) return '0s';
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            if (h > 0) return h + 'h ' + m + 'm';
+            if (m > 0) return m + 'm ' + s + 's';
+            return s + 's';
+        }
+
+        // Helper: Format token count to K/M notation
+        function formatTokens(count) {
+            if (!count) return '0';
+            if (count >= 1000000) return (count / 1000000).toFixed(1) + 'M';
+            if (count >= 1000) return (count / 1000).toFixed(1) + 'K';
+            return count.toString();
+        }
+
         // Sparkline Component
         function Sparkline({ data = [], height = 24, color = 'var(--accent-primary)' }) {
             const max = Math.max(...data, 1);
@@ -1170,16 +1608,23 @@ def get_embedded_frontend() -> str:
                             </div>
                             <div className="metric-label">Errors</div>
                         </div>
-                        <div className="card metric-card">
-                            <div className="metric-value">{data.stats.error_rate}%</div>
-                            <div className="metric-label">Error Rate</div>
+                        <div className="card metric-card dual">
+                            <div className="dual-metric">
+                                <div className="metric-value">{formatDuration(data.session.duration)}</div>
+                                <div className="metric-label">Session</div>
+                            </div>
+                            <div className="metric-divider" />
+                            <div className="dual-metric">
+                                <div className="metric-value">{formatTokens(data.tokens.ctx_monitor)}</div>
+                                <div className="metric-label">CTX tokens used</div>
+                            </div>
                         </div>
                     </div>
 
                     {/* Token Usage */}
                     <div className="card">
                         <div className="card-header">
-                            <span className="card-title">Token Usage</span>
+                            <span className="card-title">Token Usage - {data.tokens.used.toLocaleString()}</span>
                             <span style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>
                                 {((data.tokens.used / data.tokens.available) * 100).toFixed(1)}% used
                             </span>
@@ -1389,7 +1834,16 @@ def get_embedded_frontend() -> str:
 
         // Alerts Page
         function AlertsPage({ data }) {
+            const [expandedAlerts, setExpandedAlerts] = React.useState({});
+
             if (!data) return <div className="loading"><div className="spinner" />Loading...</div>;
+
+            const toggleAlert = (id) => {
+                setExpandedAlerts(prev => ({
+                    ...prev,
+                    [id]: !prev[id]
+                }));
+            };
 
             return (
                 <div className="grid" style={{ gap: '24px' }}>
@@ -1427,32 +1881,102 @@ def get_embedded_frontend() -> str:
                                     <p>No active alerts. System is healthy.</p>
                                 </div>
                             ) : (
-                                data.alerts.map((alert, i) => (
-                                    <div key={i} className="alert-item">
-                                        <div className={`alert-indicator ${alert.severity.toLowerCase()}`} />
-                                        <div className="alert-content">
-                                            <div className="alert-severity" style={{
-                                                color: alert.severity === 'CRITICAL' ? 'var(--error)'
-                                                    : alert.severity === 'HIGH' ? '#F97316'
-                                                    : alert.severity === 'MEDIUM' ? 'var(--warning)'
-                                                    : 'var(--info)'
-                                            }}>
-                                                {alert.severity}
+                                data.alerts.map((alert, i) => {
+                                    const alertId = alert.id || i;
+                                    const isExpanded = expandedAlerts[alertId];
+                                    const hasDetails = alert.related_events && alert.related_events.length > 0;
+
+                                    return (
+                                        <div
+                                            key={alertId}
+                                            className={"alert-item" + (hasDetails ? " expandable" : "") + (isExpanded ? " expanded" : "")}
+                                            onClick={() => hasDetails && toggleAlert(alertId)}
+                                        >
+                                            <div className="alert-header">
+                                                <div className={"alert-indicator " + alert.severity.toLowerCase()} />
+                                                <div className="alert-content">
+                                                    <div className="alert-severity" style={{
+                                                        color: alert.severity === 'CRITICAL' ? 'var(--error)'
+                                                            : alert.severity === 'HIGH' ? '#F97316'
+                                                            : alert.severity === 'MEDIUM' ? 'var(--warning)'
+                                                            : 'var(--info)'
+                                                    }}>
+                                                        {alert.severity}
+                                                    </div>
+                                                    <div className="alert-message">{alert.message}</div>
+                                                </div>
+                                                {hasDetails && (
+                                                    <button className="alert-expand-btn" onClick={(e) => { e.stopPropagation(); toggleAlert(alertId); }}>
+                                                        {isExpanded ? 'Hide' : 'Details'}
+                                                    </button>
+                                                )}
                                             </div>
-                                            <div className="alert-message">{alert.message}</div>
-                                            <div className="alert-recommendation">
-                                                <Icons.Lightbulb /> {alert.recommendation}
-                                            </div>
+
+                                            {hasDetails && (
+                                                <div className="alert-details" onClick={(e) => e.stopPropagation()}>
+                                                    {/* Related Events */}
+                                                    <div className="alert-section">
+                                                        <div className="alert-section-title">Affected Events (last {alert.related_events.length})</div>
+                                                        <div className="alert-events">
+                                                            {alert.related_events.map((ev, j) => (
+                                                                <div key={j} className="alert-event">
+                                                                    <span className="alert-event-time">{ev.timestamp}</span>
+                                                                    <span className="alert-event-type">{ev.event_type}</span>
+                                                                    <span className="alert-event-tool">{ev.tool_name}</span>
+                                                                    <span className="alert-event-args">{ev.args_preview || ev.error_message || '-'}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Timeline */}
+                                                    {alert.first_occurrence && (
+                                                        <div className="alert-section">
+                                                            <div className="alert-section-title">Timeline</div>
+                                                            <div className="alert-timeline">
+                                                                <div className="alert-timeline-item">
+                                                                    <span className="alert-timeline-label">First</span>
+                                                                    <span className="alert-timeline-value">{alert.first_occurrence}</span>
+                                                                </div>
+                                                                <div className="alert-timeline-item">
+                                                                    <span className="alert-timeline-label">Last</span>
+                                                                    <span className="alert-timeline-value">{alert.last_occurrence}</span>
+                                                                </div>
+                                                                <div className="alert-timeline-item">
+                                                                    <span className="alert-timeline-label">Count</span>
+                                                                    <span className="alert-timeline-value">{alert.occurrences_count}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Recommendation */}
+                                                    <div className="alert-section">
+                                                        <div className="alert-section-title">Possible Causes</div>
+                                                        <div className="alert-causes">{alert.recommendation}</div>
+                                                    </div>
+
+                                                    {/* Action Command */}
+                                                    {alert.action_command && (
+                                                        <div className="alert-section">
+                                                            <div className="alert-section-title">Recommended Action</div>
+                                                            <div className="alert-action">
+                                                                <span>Run:</span>
+                                                                <code>{alert.action_command}</code>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
-                                    </div>
-                                ))
+                                    );
+                                })
                             )}
                         </div>
                     </div>
                 </div>
             );
         }
-
         // Stack Page
         function StackPage({ data }) {
             if (!data) return <div className="loading"><div className="spinner" />Loading...</div>;
@@ -1640,7 +2164,7 @@ def get_embedded_frontend() -> str:
                     <header className="header">
                         <div className="logo">
                             <Icons.AuditShield />
-                            <span><span style={{color: "var(--brand-deep-slate)"}}>ctx</span><span style={{color: "var(--brand-audit-blue)"}}>-monitor</span></span>
+                            <span><span style={{color: "var(--logo-shield)"}}>ctx</span><span style={{color: "var(--brand-audit-blue)"}}>-monitor</span></span>
                         </div>
 
                         <nav className={`nav ${menuOpen ? "open" : ""}`}>
@@ -1655,14 +2179,6 @@ def get_embedded_frontend() -> str:
                             ))}
                         </nav>
 
-                        <button
-                                className="menu-toggle"
-                                onClick={() => setMenuOpen(!menuOpen)}
-                                title="Toggle menu"
-                            >
-                                {menuOpen ? <Icons.Close /> : <Icons.Menu />}
-                            </button>
-
                         <div className="header-actions">
                             <div className="live-indicator">
                                 <div className="live-dot" />
@@ -1674,6 +2190,13 @@ def get_embedded_frontend() -> str:
                                 title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
                             >
                                 {darkMode ? <Icons.Sun /> : <Icons.Moon />}
+                            </button>
+                            <button
+                                className="menu-toggle"
+                                onClick={() => setMenuOpen(!menuOpen)}
+                                title="Toggle menu"
+                            >
+                                {menuOpen ? <Icons.Close /> : <Icons.Menu />}
                             </button>
                         </div>
                     </header>

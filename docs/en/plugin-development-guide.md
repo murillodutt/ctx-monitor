@@ -3,7 +3,7 @@
 Complete manual for developing plugins for Claude Code CLI.
 
 **Based on:** claude-plugins-official (Anthropic) + official plugin-dev
-**Version:** 0.3.5
+**Version:** 0.3.6
 **Last updated:** 2026-01-12
 
 ---
@@ -240,7 +240,7 @@ Location: `.claude-plugin/plugin.json`
 }
 ```
 
-#### Extended Example (With Optional Fields)
+#### Complete Example (Tested and Working Format)
 
 ```json
 {
@@ -253,6 +253,8 @@ Location: `.claude-plugin/plugin.json`
   }
 }
 ```
+
+> **IMPORTANT:** This is the exact format that works in the Claude Code CLI plugin manager. Tested and validated.
 
 ### plugin.json Field Reference
 
@@ -270,7 +272,34 @@ Location: `.claude-plugin/plugin.json`
 | `name` | **Yes** | string | Author/organization name |
 | `email` | **Yes** | string | Contact email |
 
-> **Note:** Official Anthropic plugins use only `name`, `description`, and `author`. The `version` field is optional but recommended for tracking releases.
+### Valid Fields Reference
+
+The plugin validator **rejects** any unrecognized field in plugin.json.
+
+**Required fields:**
+- `name` - Plugin identifier (kebab-case)
+- `description` - Brief description
+- `author` - Object with `name` and `email`
+
+**Optional fields:**
+- `version` - Semantic version (e.g., "1.0.0")
+- `repository` - Repository URL
+- `keywords` - Array of keywords
+- `license` - License identifier (e.g., "MIT")
+- `hooks` - Path to hooks configuration file (e.g., "./hooks/hooks.json")
+
+**INVALID fields (DO NOT use):**
+- `components` - DOES NOT EXIST in the schema
+- `commands` (as list) - DO NOT list, they are auto-discovered
+- `agents` (as list) - DO NOT list, they are auto-discovered
+- `skills` (as list) - DO NOT list, they are auto-discovered
+
+**Common error:**
+```
+Plugin has an invalid manifest file. Validation errors: : Unrecognized key: "components"
+```
+
+**Auto-discovery:** The directories `commands/`, `agents/`, `skills/`, `hooks/` at the plugin root are discovered automatically. You DO NOT need to list them in the manifest.
 
 ### Namespace Behavior
 
@@ -944,6 +973,18 @@ Skills use a three-level loading system to manage context efficiently:
 **Solution:**
 - Verify `marketplace.json` follows official pattern
 - Remove `plugin.json` from marketplace root
+
+### Unrecognized key
+
+**Symptom:** `Plugin has an invalid manifest file. Validation errors: : Unrecognized key: "components"`
+
+**Cause:** Invalid field in plugin.json (e.g., `components`, `commands` as array)
+
+**Solution:**
+1. Remove unrecognized fields from plugin.json
+2. Valid fields: `name`, `description`, `author`, `version`, `repository`, `keywords`, `license`, `hooks`
+3. DO NOT list commands/agents/skills - they are auto-discovered
+4. Validate with: `claude plugin validate ./path/to/plugin`
 
 ### Plugin Not Appearing
 
