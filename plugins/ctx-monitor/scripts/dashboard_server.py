@@ -511,14 +511,14 @@ def get_embedded_frontend() -> str:
         .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             font-weight: 700;
-            font-size: 15px;
+            font-size: 18px;
         }
 
         .logo-icon {
-            width: 28px;
-            height: 28px;
+            width: 34px;
+            height: 34px;
             background: var(--accent-primary);
             border-radius: var(--radius-sm);
             display: flex;
@@ -526,6 +526,62 @@ def get_embedded_frontend() -> str:
             justify-content: center;
             font-weight: 700;
             color: var(--brand-white);
+        }
+
+        /* Mobile menu */
+        .menu-toggle {
+            display: none;
+            padding: 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .nav {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                background: var(--bg-secondary);
+                border-bottom: 1px solid var(--border-color);
+                padding: 12px;
+                gap: 8px;
+                display: none;
+                box-shadow: var(--shadow-md);
+            }
+
+            .nav.open {
+                display: flex;
+            }
+
+            .nav-item {
+                width: 100%;
+                text-align: center;
+                padding: 12px 16px;
+            }
+
+            .header {
+                flex-wrap: wrap;
+                position: relative;
+            }
+
+            .header-actions {
+                order: 2;
+            }
+
+            .live-indicator {
+                display: none;
+            }
         }
 
         .live-indicator {
@@ -978,10 +1034,20 @@ def get_embedded_frontend() -> str:
         // SVG Icons
         const Icons = {
             // Audit Shield Logo - ctx-monitor brand identity
-            AuditShield: ({ size = 28 }) => (
+            AuditShield: ({ size = 38 }) => (
                 <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
                     <path d="M50 12L88 28V55C88 77.5 50 88 50 88C50 88 12 77.5 12 55V28L50 12Z" stroke="var(--brand-deep-slate)" strokeWidth="5" strokeLinejoin="round"/>
                     <path d="M28 50H41L47 38L53 62L59 50H72" stroke="var(--brand-audit-blue)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+            ),
+            Menu: () => (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            ),
+            Close: () => (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                 </svg>
             ),
             Sun: () => (
@@ -1514,6 +1580,7 @@ def get_embedded_frontend() -> str:
             const [darkMode, setDarkMode] = useState(false);
             const [data, setData] = useState({});
             const [loading, setLoading] = useState(true);
+            const [menuOpen, setMenuOpen] = useState(false);
 
             const fetchData = useCallback(async () => {
                 try {
@@ -1567,21 +1634,29 @@ def get_embedded_frontend() -> str:
                 <div className="app">
                     <header className="header">
                         <div className="logo">
-                            <Icons.AuditShield size={32} />
+                            <Icons.AuditShield />
                             <span><span style={{color: "var(--brand-deep-slate)"}}>ctx</span><span style={{color: "var(--brand-audit-blue)"}}>-monitor</span></span>
                         </div>
 
-                        <nav className="nav">
+                        <nav className={`nav ${menuOpen ? "open" : ""}`}>
                             {pages.map(p => (
                                 <button
                                     key={p.id}
                                     className={`nav-item ${page === p.id ? 'active' : ''}`}
-                                    onClick={() => setPage(p.id)}
+                                    onClick={() => { setPage(p.id); setMenuOpen(false); }}
                                 >
                                     {p.label}
                                 </button>
                             ))}
                         </nav>
+
+                        <button
+                                className="menu-toggle"
+                                onClick={() => setMenuOpen(!menuOpen)}
+                                title="Toggle menu"
+                            >
+                                {menuOpen ? <Icons.Close /> : <Icons.Menu />}
+                            </button>
 
                         <div className="header-actions">
                             <div className="live-indicator">
