@@ -80,20 +80,30 @@ fi
 # Generate ISO8601 timestamp with milliseconds (cross-platform)
 # BSD date (macOS) doesn't support %N, so we detect and use appropriate method
 generate_timestamp() {
+  local ts=""
+
   if command -v gdate >/dev/null 2>&1; then
     # GNU date available (e.g., via coreutils on macOS)
-    gdate -u +"%Y-%m-%dT%H:%M:%S.%3NZ"
+    ts=$(gdate -u +"%Y-%m-%dT%H:%M:%S.%3NZ")
   elif date --version >/dev/null 2>&1; then
     # GNU date (Linux)
-    date -u +"%Y-%m-%dT%H:%M:%S.%3NZ"
+    ts=$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")
   else
     # BSD date (macOS) - use perl for milliseconds
-    perl -MTime::HiRes=gettimeofday -MPOSIX=strftime -e '
+    ts=$(perl -MTime::HiRes=gettimeofday -MPOSIX=strftime -e '
       my ($sec, $usec) = gettimeofday();
       my $ms = int($usec / 1000);
       print strftime("%Y-%m-%dT%H:%M:%S", gmtime($sec)) . sprintf(".%03dZ", $ms);
-    ' 2>/dev/null || date -u +"%Y-%m-%dT%H:%M:%S.000Z"
+    ' 2>/dev/null)
   fi
+
+  # Validate timestamp format (detect if %N wasn't expanded, e.g., ".3NZ")
+  if [ -z "$ts" ] || echo "$ts" | grep -qE '\.[0-9]*N'; then
+    # Fallback: generate timestamp without milliseconds
+    ts=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
+  fi
+
+  echo "$ts"
 }
 timestamp=$(generate_timestamp)
 
@@ -238,25 +248,47 @@ echo "$base_event" | jq -c '.' >> "$session_file"
 
 # Update sessions index
 sessions_index="${trace_dir}/sessions.json"
-if [ ! -f "$sessions_index" ]; then
+
+# Ensure sessions.json exists and is valid JSON
+# Check if file doesn't exist OR is empty OR is not valid JSON
+if [ ! -f "$sessions_index" ] || [ ! -s "$sessions_index" ] || ! jq empty "$sessions_index" 2>/dev/null; then
   echo '{"sessions": []}' > "$sessions_index"
 fi
 
 # Check if session already in index
-session_exists=$(jq --arg sid "$session_id" '.sessions | map(select(.session_id == $sid)) | length > 0' "$sessions_index")
+session_exists=$(jq --arg sid "$session_id" '.sessions | map(select(.session_id == $sid)) | length > 0' "$sessions_index" 2>/dev/null)
+
+# Handle case where jq returns empty or error
+if [ -z "$session_exists" ] || [ "$session_exists" = "null" ]; then
+  # Reset file if corrupted
+  echo '{"sessions": []}' > "$sessions_index"
+  session_exists="false"
+fi
 
 if [ "$session_exists" = "false" ]; then
   # Add new session to index
-  jq --arg sid "$session_id" \
+  if jq --arg sid "$session_id" \
      --arg start "$timestamp" \
      --arg cwd "$cwd" \
      '.sessions += [{session_id: $sid, started_at: $start, cwd: $cwd, event_count: 1}]' \
-     "$sessions_index" > "${sessions_index}.tmp" && mv "${sessions_index}.tmp" "$sessions_index"
+     "$sessions_index" > "${sessions_index}.tmp" 2>/dev/null; then
+    mv "${sessions_index}.tmp" "$sessions_index"
+  else
+    # If jq fails, reset and try again
+    echo '{"sessions": []}' > "$sessions_index"
+    jq --arg sid "$session_id" \
+       --arg start "$timestamp" \
+       --arg cwd "$cwd" \
+       '.sessions += [{session_id: $sid, started_at: $start, cwd: $cwd, event_count: 1}]' \
+       "$sessions_index" > "${sessions_index}.tmp" && mv "${sessions_index}.tmp" "$sessions_index"
+  fi
 else
   # Update event count
-  jq --arg sid "$session_id" \
+  if jq --arg sid "$session_id" \
      '(.sessions[] | select(.session_id == $sid) | .event_count) += 1' \
-     "$sessions_index" > "${sessions_index}.tmp" && mv "${sessions_index}.tmp" "$sessions_index"
+     "$sessions_index" > "${sessions_index}.tmp" 2>/dev/null; then
+    mv "${sessions_index}.tmp" "$sessions_index"
+  fi
 fi
 
 # Output success (no output to transcript by default)
