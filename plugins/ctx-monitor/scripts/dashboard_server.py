@@ -398,44 +398,52 @@ def get_embedded_frontend() -> str:
     <title>ctx-monitor Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         :root {
-            --bg-primary: #FAFAFA;
-            --bg-secondary: #FFFFFF;
-            --bg-tertiary: #F5F5F5;
-            --text-primary: #1A1A1A;
-            --text-secondary: #666666;
-            --text-muted: #999999;
-            --border-color: #E5E5E5;
-            --border-strong: #CCCCCC;
-            --accent-primary: #FFB800;
-            --accent-secondary: #FF9500;
-            --success: #22C55E;
-            --error: #EF4444;
-            --warning: #F59E0B;
-            --info: #3B82F6;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.06);
-            --shadow-lg: 0 10px 15px rgba(0,0,0,0.08);
+            /* Brand Colors - ctx-monitor Visual Identity */
+            --brand-deep-slate: #2C3E50;
+            --brand-audit-blue: #3498DB;
+            --brand-white: #FFFFFF;
+            --brand-light-gray: #F4F7F6;
+
+            /* Theme Colors */
+            --bg-primary: var(--brand-light-gray);
+            --bg-secondary: var(--brand-white);
+            --bg-tertiary: #E8EDEF;
+            --text-primary: var(--brand-deep-slate);
+            --text-secondary: #5D6D7E;
+            --text-muted: #85929E;
+            --border-color: #D5DBDB;
+            --border-strong: #AAB7B8;
+            --accent-primary: var(--brand-audit-blue);
+            --accent-secondary: #2980B9;
+            --success: #27AE60;
+            --error: #E74C3C;
+            --warning: #F39C12;
+            --info: var(--brand-audit-blue);
+            --shadow-sm: 0 1px 2px rgba(44,62,80,0.04);
+            --shadow-md: 0 4px 6px rgba(44,62,80,0.06);
+            --shadow-lg: 0 10px 15px rgba(44,62,80,0.08);
             --radius-sm: 4px;
             --radius-md: 8px;
             --radius-lg: 12px;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
 
         .dark {
-            --bg-primary: #0D0D0D;
-            --bg-secondary: #1A1A1A;
-            --bg-tertiary: #262626;
-            --text-primary: #FAFAFA;
-            --text-secondary: #A3A3A3;
-            --text-muted: #666666;
-            --border-color: #333333;
-            --border-strong: #404040;
+            --bg-primary: #1A252F;
+            --bg-secondary: var(--brand-deep-slate);
+            --bg-tertiary: #34495E;
+            --text-primary: var(--brand-white);
+            --text-secondary: #BDC3C7;
+            --text-muted: #7F8C8D;
+            --border-color: #34495E;
+            --border-strong: #5D6D7E;
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
             --shadow-lg: 0 10px 15px rgba(0,0,0,0.4);
@@ -448,12 +456,17 @@ def get_embedded_frontend() -> str:
         }
 
         body {
-            font-family: var(--font-mono);
+            font-family: var(--font-sans);
             background: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.5;
             font-size: 13px;
             min-height: 100vh;
+        }
+
+        /* Code elements use monospace */
+        code, pre, .event-time, .event-tool, .bar-value, .metric-value {
+            font-family: var(--font-mono);
         }
 
         #root {
@@ -512,7 +525,7 @@ def get_embedded_frontend() -> str:
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            color: #000;
+            color: var(--brand-white);
         }
 
         .live-indicator {
@@ -964,6 +977,13 @@ def get_embedded_frontend() -> str:
 
         // SVG Icons
         const Icons = {
+            // Audit Shield Logo - ctx-monitor brand identity
+            AuditShield: ({ size = 28 }) => (
+                <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+                    <path d="M50 12L88 28V55C88 77.5 50 88 50 88C50 88 12 77.5 12 55V28L50 12Z" stroke="var(--brand-deep-slate)" strokeWidth="5" strokeLinejoin="round"/>
+                    <path d="M28 50H41L47 38L53 62L59 50H72" stroke="var(--brand-audit-blue)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+            ),
             Sun: () => (
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
@@ -1254,7 +1274,7 @@ def get_embedded_frontend() -> str:
                                         <span style={{ fontWeight: '500' }}>{type}</span>
                                         <span style={{
                                             background: 'var(--accent-primary)',
-                                            color: '#000',
+                                            color: 'var(--brand-white)',
                                             padding: '2px 8px',
                                             borderRadius: '9999px',
                                             fontSize: '11px',
@@ -1547,8 +1567,8 @@ def get_embedded_frontend() -> str:
                 <div className="app">
                     <header className="header">
                         <div className="logo">
-                            <div className="logo-icon">◉</div>
-                            <span>ctx-monitor</span>
+                            <Icons.AuditShield size={32} />
+                            <span><span style={{color: "var(--brand-deep-slate)"}}>ctx</span><span style={{color: "var(--brand-audit-blue)"}}>-monitor</span></span>
                         </div>
 
                         <nav className="nav">
