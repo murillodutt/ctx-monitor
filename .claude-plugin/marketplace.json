@@ -17,8 +17,8 @@
         "email": "murillo@duttyeshua.com"
       },
       "source": {
-        "source": "github",
-        "repo": "murillodutt/ctx-monitor"
+        "type": "git",
+        "url": "https://github.com/murillodutt/ctx-monitor.git"
       },
       "category": "development",
       "homepage": "https://github.com/murillodutt/ctx-monitor"
