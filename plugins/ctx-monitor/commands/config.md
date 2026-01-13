@@ -20,6 +20,7 @@ Configure ctx-monitor behavior for the current project.
    - `disable`: Disable ctx-monitor for this project
    - `set <key> <value>`: Set a configuration value
    - `clear`: Delete all inactive session logs (keeps active session)
+   - `clear --force`: Delete ALL logs (including active session)
 
 2. Run the config-manager script:
 
@@ -39,6 +40,9 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/config-manager.py "$(pwd)" set --key log_l
 
 # Clear inactive logs
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/config-manager.py "$(pwd)" clear
+
+# Clear ALL logs (force)
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/config-manager.py "$(pwd)" clear --force
 ```
 
 ## Configuration File
@@ -109,6 +113,9 @@ anonymize_on_export: true
 
 # Clear inactive session logs
 /ctx-monitor:config clear
+
+# Clear ALL logs (force)
+/ctx-monitor:config clear --force
 ```
 
 ## File Location

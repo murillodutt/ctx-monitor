@@ -2384,8 +2384,16 @@ def get_embedded_frontend() -> str:
                         alerts: '/api/alerts',
                         stack: '/api/stack'
                     };
-                    const result = await api.fetch(endpoints[page]);
-                    setData(prev => ({ ...prev, [page]: result }));
+                    // Always fetch overview for live status indicator
+                    const [pageResult, overviewResult] = await Promise.all([
+                        api.fetch(endpoints[page]),
+                        page !== 'overview' ? api.fetch('/api/overview') : Promise.resolve(null)
+                    ]);
+                    setData(prev => ({
+                        ...prev,
+                        [page]: pageResult,
+                        ...(overviewResult && { overview: overviewResult })
+                    }));
                     setLoading(false);
                 } catch (err) {
                     console.error('API Error:', err);
@@ -2444,9 +2452,9 @@ def get_embedded_frontend() -> str:
                         </nav>
 
                         <div className="header-actions">
-                            <div className={`live-indicator ${data?.session?.is_active ? '' : 'offline'}`}>
+                            <div className={`live-indicator ${data?.overview?.session?.is_active ? '' : 'offline'}`}>
                                 <div className="live-dot" />
-                                {data?.session?.is_active ? 'Live' : 'Offline'}
+                                {data?.overview?.session?.is_active ? 'Live' : 'Offline'}
                             </div>
                             <button
                                 className="theme-toggle"

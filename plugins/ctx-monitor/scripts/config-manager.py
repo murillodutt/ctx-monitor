@@ -272,23 +272,24 @@ Edit the YAML frontmatter above to customize settings.
                 "include_args": True
             }
 
-    def clear_inactive_logs(self, keep_active: bool = True) -> Dict[str, Any]:
+    def clear_inactive_logs(self, keep_active: bool = True, force: bool = False) -> Dict[str, Any]:
         """
-        Clear inactive session logs.
+        Clear session logs.
 
         Args:
             keep_active: If True, keeps the currently active session (if any).
+            force: If True, clears ALL logs regardless of state.
 
         Returns:
             Dict with cleared files count and freed space.
         """
         traces_dir = self.config_dir / "ctx-monitor" / "traces"
         if not traces_dir.exists():
-            return {"cleared": 0, "freed_bytes": 0, "kept": 0, "files": []}
+            return {"cleared": 0, "freed_bytes": 0, "kept": 0, "files": [], "forced": force}
 
         # Get active session ID from runtime config
         active_session = None
-        if keep_active and self.runtime_config.exists():
+        if keep_active and not force and self.runtime_config.exists():
             try:
                 runtime = json.loads(self.runtime_config.read_text())
                 if runtime.get("enabled", False):
@@ -304,9 +305,17 @@ Edit the YAML frontmatter above to customize settings.
         for trace_file in traces_dir.glob("session_*.jsonl"):
             session_id = trace_file.stem.replace("session_", "")
 
-            # Skip active session
-            if active_session and session_id == active_session:
+            # Skip active session (unless force)
+            if not force and active_session and session_id == active_session:
                 kept_files.append(trace_file.name)
+                continue
+
+            # If force, delete everything
+            if force:
+                file_size = trace_file.stat().st_size
+                trace_file.unlink()
+                cleared_files.append(trace_file.name)
+                freed_bytes += file_size
                 continue
 
             # Check if session has ended (has SessionEnd event)
@@ -352,11 +361,19 @@ Edit the YAML frontmatter above to customize settings.
             except (json.JSONDecodeError, IOError):
                 pass
 
+        # If force, also reset sessions.json
+        if force and sessions_index.exists():
+            try:
+                sessions_index.write_text('{"sessions": []}')
+            except IOError:
+                pass
+
         return {
             "cleared": len(cleared_files),
             "freed_bytes": freed_bytes,
             "kept": len(kept_files),
-            "files": cleared_files
+            "files": cleared_files,
+            "forced": force
         }
 
 
@@ -392,17 +409,21 @@ def format_clear_result(result: Dict[str, Any]) -> str:
     """Format clear result as human-readable text."""
     lines = []
     lines.append("=" * 50)
-    lines.append("CTX-MONITOR CLEAR INACTIVE LOGS")
+    if result.get("forced"):
+        lines.append("CTX-MONITOR CLEAR ALL LOGS (FORCED)")
+    else:
+        lines.append("CTX-MONITOR CLEAR INACTIVE LOGS")
     lines.append("=" * 50)
 
     if result["cleared"] == 0:
-        lines.append("\nNo inactive sessions to clear.")
+        lines.append("\nNo sessions to clear.")
         lines.append(f"Sessions kept: {result['kept']}")
     else:
         freed_kb = result["freed_bytes"] / 1024
         freed_str = f"{freed_kb:.1f} KB" if freed_kb < 1024 else f"{freed_kb/1024:.2f} MB"
 
-        lines.append(f"\n✓ Cleared {result['cleared']} inactive session(s)")
+        session_type = "session(s)" if not result.get("forced") else "session(s) [ALL]"
+        lines.append(f"\n✓ Cleared {result['cleared']} {session_type}")
         lines.append(f"  Freed: {freed_str}")
         lines.append(f"  Kept: {result['kept']} session(s)")
 
@@ -427,6 +448,7 @@ def main():
     parser.add_argument("--template", help="Path to template file (for init)")
     parser.add_argument("--event", help="Event type to check (for check-event)")
     parser.add_argument("--tool", help="Tool name to check (for check-event)")
+    parser.add_argument("--force", action="store_true", help="Force clear ALL logs (for clear)")
     parser.add_argument("--format", choices=["json", "text"], default="text")
     args = parser.parse_args()
 
@@ -503,7 +525,7 @@ def main():
         sys.exit(0 if should_log else 1)
 
     elif args.action == "clear":
-        result = manager.clear_inactive_logs(keep_active=True)
+        result = manager.clear_inactive_logs(keep_active=True, force=args.force)
         if args.format == "json":
             print(json.dumps(result, indent=2))
         else:
