@@ -409,54 +409,122 @@ def get_embedded_frontend() -> str:
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         :root {
-            /* Brand Colors - ctx-monitor Visual Identity */
-            --brand-deep-slate: #2C3E50;
-            --brand-audit-blue: #3498DB;
+            /* Design System v2.0 - Clean SaaS Dashboard */
+
+            /* Brand Colors */
+            --color-primary: #10B981;
+            --color-primary-light: #D1FAE5;
+            --color-primary-dark: #059669;
+            --color-secondary: #F59E0B;
+            --color-secondary-light: #FEF3C7;
+            --color-accent: #3B82F6;
+            --color-accent-light: #DBEAFE;
+
+            /* UI Colors */
+            --color-tab-active: #000000;
+            --color-tab-active-text: #FFFFFF;
+            --color-surface: #FFFFFF;
+            --color-bg: #F8FAFC;
+            --color-border: #E2E8F0;
+            --color-border-strong: #CBD5E1;
+
+            /* Neutral Scale */
+            --color-neutral-50: #F8FAFC;
+            --color-neutral-100: #F1F5F9;
+            --color-neutral-200: #E2E8F0;
+            --color-neutral-300: #CBD5E1;
+            --color-neutral-400: #94A3B8;
+            --color-neutral-500: #64748B;
+            --color-neutral-600: #475569;
+            --color-neutral-700: #334155;
+            --color-neutral-800: #1E293B;
+            --color-neutral-900: #0F172A;
+
+            /* Text Colors */
+            --text-primary: #1E293B;
+            --text-secondary: #64748B;
+            --text-muted: #94A3B8;
+
+            /* Semantic Colors */
+            --success: #10B981;
+            --success-light: #D1FAE5;
+            --error: #EF4444;
+            --error-light: #FEE2E2;
+            --warning: #F59E0B;
+            --warning-light: #FEF3C7;
+            --info: #3B82F6;
+            --info-light: #DBEAFE;
+
+            /* Legacy mappings for compatibility */
+            --bg-primary: var(--color-bg);
+            --bg-secondary: var(--color-surface);
+            --bg-tertiary: var(--color-neutral-100);
+            --border-color: var(--color-border);
+            --border-strong: var(--color-border-strong);
+            --accent-primary: var(--color-primary);
+            --accent-secondary: var(--color-primary-dark);
+
+            /* Logo colors */
+            --logo-shield: var(--color-neutral-800);
+            --logo-pulse: var(--color-primary);
             --brand-white: #FFFFFF;
-            --brand-light-gray: #F4F7F6;
+            --brand-audit-blue: var(--color-primary);
 
-            /* Logo colors - adapt to theme */
-            --logo-shield: var(--brand-deep-slate);
-            --logo-pulse: var(--brand-audit-blue);
+            /* Shadows - Subtle */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
-            /* Theme Colors */
-            --bg-primary: var(--brand-light-gray);
-            --bg-secondary: var(--brand-white);
-            --bg-tertiary: #E8EDEF;
-            --text-primary: var(--brand-deep-slate);
-            --text-secondary: #5D6D7E;
-            --text-muted: #85929E;
-            --border-color: #D5DBDB;
-            --border-strong: #AAB7B8;
-            --accent-primary: var(--brand-audit-blue);
-            --accent-secondary: #2980B9;
-            --success: #27AE60;
-            --error: #E74C3C;
-            --warning: #F39C12;
-            --info: var(--brand-audit-blue);
-            --shadow-sm: 0 1px 2px rgba(44,62,80,0.04);
-            --shadow-md: 0 4px 6px rgba(44,62,80,0.06);
-            --shadow-lg: 0 10px 15px rgba(44,62,80,0.08);
-            --radius-sm: 4px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-full: 9999px;
+
+            /* Typography */
             --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-normal: 200ms ease;
         }
 
         .dark {
-            --bg-primary: #1A252F;
-            --bg-secondary: var(--brand-deep-slate);
-            --logo-shield: var(--brand-white);
-            --bg-tertiary: #34495E;
-            --text-primary: var(--brand-white);
-            --text-secondary: #BDC3C7;
-            --text-muted: #7F8C8D;
-            --border-color: #34495E;
-            --border-strong: #5D6D7E;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
-            --shadow-lg: 0 10px 15px rgba(0,0,0,0.4);
+            /* Core backgrounds - Pure neutral grays (no blue tint) */
+            --color-surface: #141414;
+            --color-bg: #1A1A1A;
+            --color-border: #2D2D2D;
+            --color-border-strong: #404040;
+
+            /* Text hierarchy - Warm whites */
+            --text-primary: #F5F5F5;
+            --text-secondary: #A3A3A3;
+            --text-muted: #737373;
+
+            /* Neutrals override - Pure grays */
+            --color-neutral-50: #1A1A1A;
+            --color-neutral-100: #262626;
+            --color-neutral-200: #404040;
+            --color-neutral-300: #525252;
+            --color-neutral-400: #737373;
+
+            /* Status badges - Semi-transparent for dark mode */
+            --success-light: rgba(16, 185, 129, 0.15);
+            --warning-light: rgba(245, 158, 11, 0.15);
+            --error-light: rgba(239, 68, 68, 0.15);
+            --info-light: rgba(59, 130, 246, 0.15);
+
+            /* Legacy mappings */
+            --bg-primary: #1A1A1A;
+            --bg-secondary: #141414;
+            --bg-tertiary: #262626;
+            --logo-shield: #F5F5F5;
+
+            /* Shadows - Deeper for dark surfaces */
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.6);
+            --shadow-lg: 0 10px 20px rgba(0,0,0,0.7);
         }
 
         * {
@@ -499,6 +567,17 @@ def get_embedded_frontend() -> str:
             background: var(--text-muted);
         }
 
+        /* Dark mode scrollbar */
+        .dark ::-webkit-scrollbar-track {
+            background: var(--color-bg);
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: var(--color-border-strong);
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
         /* Layout */
         .app {
             display: flex;
@@ -511,7 +590,7 @@ def get_embedded_frontend() -> str:
             align-items: center;
             justify-content: space-between;
             padding: clamp(12px, 2vw, 18px) clamp(14px, 3vw, 26px);
-            background: var(--bg-secondary);
+            background: var(--color-surface);
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
@@ -521,7 +600,8 @@ def get_embedded_frontend() -> str:
         }
 
         .dark .header {
-            background: rgba(44, 62, 80, 0.95);
+            background: rgba(20, 20, 20, 0.95);
+            border-color: var(--color-border);
         }
 
         .logo {
@@ -549,7 +629,7 @@ def get_embedded_frontend() -> str:
             display: none;
             padding: 8px;
             background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--color-border);
             border-radius: var(--radius-sm);
             color: var(--text-primary);
             cursor: pointer;
@@ -568,7 +648,7 @@ def get_embedded_frontend() -> str:
                 left: 0;
                 right: 0;
                 flex-direction: column;
-                background: var(--bg-secondary);
+                background: var(--color-surface);
                 border-bottom: 1px solid var(--border-color);
                 padding: 12px;
                 gap: 8px;
@@ -626,33 +706,42 @@ def get_embedded_frontend() -> str:
         .nav {
             display: flex;
             gap: 4px;
-            background: var(--bg-tertiary);
-            padding: 4px;
-            border-radius: var(--radius-md);
+            background: transparent;
+            padding: 0;
         }
 
         .nav-item {
             padding: 8px 16px;
             background: transparent;
             border: none;
-            border-radius: var(--radius-sm);
+            border-radius: var(--radius-md);
             color: var(--text-secondary);
-            font-family: var(--font-mono);
-            font-size: 12px;
+            font-family: var(--font-sans);
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: var(--transition-fast);
         }
 
         .nav-item:hover {
             color: var(--text-primary);
-            background: var(--bg-secondary);
+            background: var(--color-neutral-100);
         }
 
         .nav-item.active {
-            color: var(--text-primary);
-            background: var(--bg-secondary);
-            box-shadow: var(--shadow-sm);
+            color: var(--color-tab-active-text);
+            background: var(--color-tab-active);
+            box-shadow: none;
+        }
+
+        /* Dark mode navigation - Inverted active state for contrast */
+        .dark .nav-item.active {
+            background: #FFFFFF;
+            color: #000000;
+        }
+
+        .dark .nav-item:hover:not(.active) {
+            background: var(--color-neutral-100);
         }
 
         .header-actions {
@@ -706,18 +795,19 @@ def get_embedded_frontend() -> str:
             }
         }
 
-        /* Cards - Enhanced */
+        /* Cards - Design System v2 */
         .card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
             border-radius: var(--radius-lg);
             overflow: hidden;
-            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-fast);
         }
 
         .card:hover {
             box-shadow: var(--shadow-md);
-            border-color: var(--border-strong);
+            
         }
 
         .card-header {
@@ -726,17 +816,17 @@ def get_embedded_frontend() -> str:
             justify-content: space-between;
             padding: clamp(12px, 2vw, 18px) clamp(14px, 2.5vw, 22px);
             border-bottom: 1px solid var(--border-color);
-            background: linear-gradient(180deg, var(--bg-secondary), var(--bg-tertiary));
+            background: var(--color-surface);
             flex-wrap: wrap;
             gap: 8px;
         }
 
         .card-title {
             font-size: clamp(10px, 1.5vw, 12px);
-            font-weight: 600;
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
         }
 
         .card-body {
@@ -828,21 +918,19 @@ def get_embedded_frontend() -> str:
         }
 
         .metric-value {
-            font-size: clamp(24px, 5vw, 36px);
+            font-size: clamp(24px, 5vw, 32px);
             font-weight: 700;
             margin-bottom: 6px;
             line-height: 1.1;
-            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
+            color: var(--text-primary);
         }
 
         .metric-label {
             font-size: clamp(9px, 1.5vw, 11px);
             color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            font-weight: 500;
+            text-transform: capitalize;
+            letter-spacing: 0;
+            font-weight: 400;
         }
 
         .metric-status {
@@ -858,20 +946,28 @@ def get_embedded_frontend() -> str:
             letter-spacing: 0.5px;
         }
 
-        .status-ok { 
-            background: linear-gradient(135deg, rgba(39, 174, 96, 0.15), rgba(39, 174, 96, 0.05)); 
+        .status-ok {
+            background: var(--success-light);
             color: var(--success);
-            box-shadow: 0 0 0 1px rgba(39, 174, 96, 0.2);
         }
-        .status-warn { 
-            background: linear-gradient(135deg, rgba(243, 156, 18, 0.15), rgba(243, 156, 18, 0.05)); 
-            color: var(--warning);
-            box-shadow: 0 0 0 1px rgba(243, 156, 18, 0.2);
+        .status-warn {
+            background: var(--warning-light);
+            color: #D97706;
         }
-        .status-alert { 
-            background: linear-gradient(135deg, rgba(231, 76, 60, 0.15), rgba(231, 76, 60, 0.05)); 
-            color: var(--error);
-            box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2);
+        .status-alert {
+            background: var(--error-light);
+            color: #DC2626;
+        }
+
+        /* Dark mode status badges - Brighter text for contrast */
+        .dark .status-ok {
+            color: #34D399;
+        }
+        .dark .status-warn {
+            color: #FBBF24;
+        }
+        .dark .status-alert {
+            color: #F87171;
         }
 
         /* Sparkline - Enhanced */
@@ -885,10 +981,10 @@ def get_embedded_frontend() -> str:
 
         .sparkline-bar {
             flex: 1;
-            background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
-            border-radius: 2px;
+            background: var(--color-primary);
+            border-radius: var(--radius-sm);
             min-width: 4px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: var(--transition-fast);
             opacity: 0.85;
         }
 
@@ -909,7 +1005,7 @@ def get_embedded_frontend() -> str:
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            background: var(--color-primary);
             border-radius: 5px;
             transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
@@ -954,11 +1050,11 @@ def get_embedded_frontend() -> str:
 
         .table th {
             font-size: clamp(9px, 1.5vw, 11px);
-            font-weight: 600;
+            font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: var(--text-secondary);
-            background: var(--bg-tertiary);
+            background: var(--color-neutral-50);
             position: sticky;
             top: 0;
             z-index: 1;
@@ -984,6 +1080,16 @@ def get_embedded_frontend() -> str:
                 padding: 8px 10px;
                 font-size: 11px;
             }
+        }
+
+        /* Dark mode table */
+        .dark .table th {
+            background: var(--color-neutral-100);
+            border-color: var(--color-border);
+        }
+
+        .dark .table th, .dark .table td {
+            border-color: var(--color-border);
         }
 
         /* Event Stream - Enhanced */
@@ -1044,6 +1150,15 @@ def get_embedded_frontend() -> str:
         .event-status.success { color: var(--success); }
         .event-status.error { color: var(--error); }
         .event-status.pending { color: var(--text-muted); }
+
+        /* Dark mode event stream - Brighter colors */
+        .dark .event-status.success { color: #34D399; }
+        .dark .event-status.error { color: #F87171; }
+
+        .dark .event-type {
+            background: var(--color-neutral-100);
+            color: var(--text-secondary);
+        }
 
         @media (max-width: 500px) {
             .event-item {
@@ -1144,7 +1259,7 @@ def get_embedded_frontend() -> str:
             margin-left: auto;
             padding: 4px 8px;
             background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--color-border);
             border-radius: 4px;
             font-size: 11px;
             color: var(--text-secondary);
@@ -1193,6 +1308,21 @@ def get_embedded_frontend() -> str:
             overflow: hidden;
         }
 
+        .dark .alert-events {
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+        }
+
+        .dark .alert-expand-btn {
+            background: var(--color-neutral-100);
+            border-color: var(--color-border);
+        }
+
+        .dark .alert-expand-btn:hover {
+            background: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
         .alert-event {
             display: grid;
             grid-template-columns: 70px 90px 60px 1fr;
@@ -1222,9 +1352,9 @@ def get_embedded_frontend() -> str:
 
         .alert-event-args {
             color: var(--text-muted);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            word-break: break-all;
+            overflow-wrap: anywhere;
+            line-height: 1.4;
         }
 
         .alert-timeline {
@@ -1263,10 +1393,40 @@ def get_embedded_frontend() -> str:
 
         .alert-action code {
             font-family: var(--font-mono);
-            background: var(--bg-secondary);
+            background: var(--color-surface);
             padding: 4px 8px;
             border-radius: 4px;
             color: var(--accent-primary);
+        }
+
+        .copy-btn {
+            padding: 4px;
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 4px;
+            width: 24px;
+            height: 24px;
+        }
+
+        .copy-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--accent-primary);
+        }
+
+        .copy-btn.copied {
+            color: var(--success);
+        }
+
+        .copy-btn svg {
+            width: 14px;
+            height: 14px;
         }
 
         .alert-causes {
@@ -1358,14 +1518,14 @@ def get_embedded_frontend() -> str:
         }
 
         .bar-success {
-            background: linear-gradient(90deg, var(--success), #2ECC71);
+            background: var(--color-primary);
             height: 100%;
             transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: var(--radius-md) 0 0 var(--radius-md);
+            border-radius: var(--radius-sm) 0 0 var(--radius-sm);
         }
 
         .bar-error {
-            background: linear-gradient(90deg, var(--error), #C0392B);
+            background: var(--color-secondary);
             height: 100%;
             transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -1388,44 +1548,81 @@ def get_embedded_frontend() -> str:
             }
         }
 
-        /* Rate Circle - Enhanced */
-        .rate-circle {
+        /* Rate Badge - Pill Style */
+        .rate-badge {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: clamp(40px, 8vw, 52px);
-            height: clamp(40px, 8vw, 52px);
-            border-radius: 50%;
-            font-size: clamp(10px, 1.8vw, 13px);
-            font-weight: 700;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            font-variant-numeric: tabular-nums;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 600;
+            transition: var(--transition-fast);
         }
 
-        .rate-circle:hover {
-            transform: scale(1.1);
-        }
 
-        .rate-excellent { 
-            background: linear-gradient(135deg, rgba(39, 174, 96, 0.2), rgba(39, 174, 96, 0.05)); 
+        .rate-excellent {
+            background: var(--success-light);
             color: var(--success);
-            box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.15);
         }
-        .rate-good { 
-            background: linear-gradient(135deg, rgba(52, 152, 219, 0.2), rgba(52, 152, 219, 0.05)); 
-            color: var(--info);
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.15);
+        .rate-good {
+            background: var(--info-light);
+            color: #2563EB;
         }
-        .rate-warning { 
-            background: linear-gradient(135deg, rgba(243, 156, 18, 0.2), rgba(243, 156, 18, 0.05)); 
-            color: var(--warning);
-            box-shadow: 0 0 0 2px rgba(243, 156, 18, 0.15);
+        .rate-warning {
+            background: var(--warning-light);
+            color: #D97706;
         }
-        .rate-poor { 
-            background: linear-gradient(135deg, rgba(231, 76, 60, 0.2), rgba(231, 76, 60, 0.05)); 
-            color: var(--error);
-            box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.15);
+        .rate-poor {
+            background: var(--error-light);
+            color: #DC2626;
         }
+
+        /* Warning Value - Orange text for slow/high values */
+        .value-warning {
+            color: var(--warning) !important;
+            font-weight: 500;
+        }
+
+        /* Table Row Hover Enhancement */
+        .table tbody tr:hover {
+            background: var(--color-neutral-50);
+        }
+
+
+        /* Method Badge - Bordered Pill */
+        .method-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px 8px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: var(--color-surface);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* Tool Name Badge */
+        .tool-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .tool-badge::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-primary);
+        }
+
 
         /* Footer */
         .footer {
@@ -1571,7 +1768,7 @@ def get_embedded_frontend() -> str:
                 : rate >= 60 ? 'rate-warning'
                 : 'rate-poor';
             return (
-                <span className={`rate-circle ${className}`}>
+                <span className={`rate-badge ${className}`}>
                     {rate.toFixed(0)}%
                 </span>
             );
@@ -1579,20 +1776,27 @@ def get_embedded_frontend() -> str:
 
         // Overview Page
         function OverviewPage({ data }) {
+
+            const [copiedCmd, setCopiedCmd] = React.useState(null);
+
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text).then(() => {
+                    setCopiedCmd(text);
+                    setTimeout(() => setCopiedCmd(null), 2000);
+                });
+            };
+
             if (!data) return <div className="loading"><div className="spinner" />Loading...</div>;
 
             return (
                 <div className="grid" style={{ gap: '24px' }}>
                     {/* Top Metrics */}
-                    <div className="grid grid-5">
+                    <div className="grid grid-3">
                         <div className="card metric-card">
                             <div className="metric-value" style={{ color: data.health.status === 'ok' ? 'var(--success)' : data.health.status === 'warn' ? 'var(--warning)' : 'var(--error)' }}>
                                 {data.health.score}
                             </div>
                             <div className="metric-label">Health Score</div>
-                            <span className={`metric-status status-${data.health.status}`}>
-                                {data.health.status.toUpperCase()}
-                            </span>
                         </div>
                         <div className="card metric-card">
                             <div className="metric-value">{data.stats.total_events}</div>
@@ -1608,16 +1812,13 @@ def get_embedded_frontend() -> str:
                             </div>
                             <div className="metric-label">Errors</div>
                         </div>
-                        <div className="card metric-card dual">
-                            <div className="dual-metric">
-                                <div className="metric-value">{formatDuration(data.session.duration)}</div>
-                                <div className="metric-label">Session</div>
-                            </div>
-                            <div className="metric-divider" />
-                            <div className="dual-metric">
-                                <div className="metric-value">{formatTokens(data.tokens.ctx_monitor)}</div>
-                                <div className="metric-label">CTX tokens used</div>
-                            </div>
+                        <div className="card metric-card">
+                            <div className="metric-value">{formatDuration(data.session.duration)}</div>
+                            <div className="metric-label">Session Time</div>
+                        </div>
+                        <div className="card metric-card">
+                            <div className="metric-value" style={{ color: 'var(--color-accent)' }}>{formatTokens(data.tokens.ctx_monitor)}</div>
+                            <div className="metric-label">CTX Tokens</div>
                         </div>
                     </div>
 
@@ -1674,6 +1875,16 @@ def get_embedded_frontend() -> str:
 
         // Tools Page
         function ToolsPage({ data }) {
+
+            const [copiedCmd, setCopiedCmd] = React.useState(null);
+
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text).then(() => {
+                    setCopiedCmd(text);
+                    setTimeout(() => setCopiedCmd(null), 2000);
+                });
+            };
+
             if (!data) return <div className="loading"><div className="spinner" />Loading...</div>;
 
             return (
@@ -1764,6 +1975,16 @@ def get_embedded_frontend() -> str:
 
         // Timeline Page
         function TimelinePage({ data }) {
+
+            const [copiedCmd, setCopiedCmd] = React.useState(null);
+
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text).then(() => {
+                    setCopiedCmd(text);
+                    setTimeout(() => setCopiedCmd(null), 2000);
+                });
+            };
+
             if (!data) return <div className="loading"><div className="spinner" />Loading...</div>;
 
             return (
@@ -1833,16 +2054,27 @@ def get_embedded_frontend() -> str:
         }
 
         // Alerts Page
-        function AlertsPage({ data }) {
-            const [expandedAlerts, setExpandedAlerts] = React.useState({});
+        function AlertsPage({ data, expandedAlerts, setExpandedAlerts }) {
+
+
+            const [copiedCmd, setCopiedCmd] = React.useState(null);
+
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text).then(() => {
+                    setCopiedCmd(text);
+                    setTimeout(() => setCopiedCmd(null), 2000);
+                });
+            };
 
             if (!data) return <div className="loading"><div className="spinner" />Loading...</div>;
 
             const toggleAlert = (id) => {
-                setExpandedAlerts(prev => ({
+                setExpandedAlerts(prev => {
+                    return {
                     ...prev,
                     [id]: !prev[id]
-                }));
+                    };
+                });
             };
 
             return (
@@ -1882,7 +2114,7 @@ def get_embedded_frontend() -> str:
                                 </div>
                             ) : (
                                 data.alerts.map((alert, i) => {
-                                    const alertId = alert.id || i;
+                                    const alertId = alert.id || ('alert_' + (alert.message || '').split('').reduce((h, c) => ((h << 5) - h) + c.charCodeAt(0), 0).toString(36));
                                     const isExpanded = expandedAlerts[alertId];
                                     const hasDetails = alert.related_events && alert.related_events.length > 0;
 
@@ -1923,7 +2155,7 @@ def get_embedded_frontend() -> str:
                                                                     <span className="alert-event-time">{ev.timestamp}</span>
                                                                     <span className="alert-event-type">{ev.event_type}</span>
                                                                     <span className="alert-event-tool">{ev.tool_name}</span>
-                                                                    <span className="alert-event-args">{ev.args_preview || ev.error_message || '-'}</span>
+                                                                    <span className="alert-event-args" title={ev.args_preview || ev.error_message || '-'}>{ev.args_preview || ev.error_message || '-'}</span>
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -1963,6 +2195,7 @@ def get_embedded_frontend() -> str:
                                                             <div className="alert-action">
                                                                 <span>Run:</span>
                                                                 <code>{alert.action_command}</code>
+                                                                <button className={"copy-btn" + (copiedCmd === alert.action_command ? " copied" : "")} onClick={(e) => { e.stopPropagation(); copyToClipboard(alert.action_command); }} title={copiedCmd === alert.action_command ? "Copied!" : "Copy to clipboard"}>{copiedCmd === alert.action_command ? (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"></polyline></svg>) : (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>)}</button>
                                                             </div>
                                                         </div>
                                                     )}
@@ -1979,6 +2212,16 @@ def get_embedded_frontend() -> str:
         }
         // Stack Page
         function StackPage({ data }) {
+
+            const [copiedCmd, setCopiedCmd] = React.useState(null);
+
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text).then(() => {
+                    setCopiedCmd(text);
+                    setTimeout(() => setCopiedCmd(null), 2000);
+                });
+            };
+
             if (!data) return <div className="loading"><div className="spinner" />Loading...</div>;
 
             return (
@@ -2110,6 +2353,7 @@ def get_embedded_frontend() -> str:
             const [data, setData] = useState({});
             const [loading, setLoading] = useState(true);
             const [menuOpen, setMenuOpen] = useState(false);
+            const [expandedAlerts, setExpandedAlerts] = useState({});
 
             const fetchData = useCallback(async () => {
                 try {
@@ -2153,7 +2397,7 @@ def get_embedded_frontend() -> str:
                     case 'overview': return <OverviewPage data={pageData} />;
                     case 'tools': return <ToolsPage data={pageData} />;
                     case 'timeline': return <TimelinePage data={pageData} />;
-                    case 'alerts': return <AlertsPage data={pageData} />;
+                    case 'alerts': return <AlertsPage data={pageData} expandedAlerts={expandedAlerts} setExpandedAlerts={setExpandedAlerts} />;
                     case 'stack': return <StackPage data={pageData} />;
                     default: return null;
                 }
