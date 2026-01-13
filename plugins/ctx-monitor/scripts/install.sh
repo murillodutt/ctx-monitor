@@ -75,7 +75,7 @@ plugin_entry = {
 try:
     with open(marketplace_file, 'r') as f:
         data = json.load(f)
-except:
+except (FileNotFoundError, json.JSONDecodeError):
     data = {"plugins": []}
 
 # Check if plugin already exists
