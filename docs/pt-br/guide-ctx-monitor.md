@@ -720,7 +720,7 @@ A pagina overview apresenta:
 A pagina stack mostra o context engineering stack:
 
 - **Stack Composition**: Barra horizontal mostrando proporcao de cada componente
-- **Rules**: Arquivos de regras (CLAUDE.md, settings.json, etc.) com tokens e secoes
+- **Rules**: Arquivos de regras (project rules, settings.json, etc.) com tokens e secoes
 - **Hooks**: Eventos configurados, disparos, erros e taxa de sucesso
 - **Skills & Agents**: Skills e agents disponiveis com uso
 
@@ -1090,7 +1090,7 @@ O sistema de auditoria do ctx-monitor e composto por quatro modulos independente
 **Objetivo**: Identificar configuracoes contraditorias.
 
 **O que identifica**:
-- Instrucoes contraditorias em CLAUDE.md
+- Instrucoes contraditorias em project rules
 - Secoes duplicadas
 - Matchers de hooks competindo
 - Conflitos de permissao em settings
@@ -1101,7 +1101,7 @@ O sistema de auditoria do ctx-monitor e composto por quatro modulos independente
 **Arquivos Analisados**:
 - `.claude/settings.json`
 - `.claude/settings.local.json`
-- `CLAUDE.md`
+- `project rules`
 - Arquivos de hooks de todos os plugins
 
 ### 9.3 Auditoria de Tokens

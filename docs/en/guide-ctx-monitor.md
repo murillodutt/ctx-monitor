@@ -889,7 +889,7 @@ The ctx-monitor audit system is composed of four independent modules, each focus
 **Objective**: Identify contradictory configurations.
 
 **What it identifies**:
-- Contradictory instructions in CLAUDE.md
+- Contradictory instructions in project rules
 - Duplicate sections
 - Competing hook matchers
 - Permission conflicts in settings
@@ -900,7 +900,7 @@ The ctx-monitor audit system is composed of four independent modules, each focus
 **Analyzed Files**:
 - `.claude/settings.json`
 - `.claude/settings.local.json`
-- `CLAUDE.md`
+- `project rules`
 - Hook files from all plugins
 
 ### 8.3 Tokens Audit

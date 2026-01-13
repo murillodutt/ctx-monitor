@@ -54,7 +54,7 @@ Detects unreliable execution patterns:
 
 ### Conflicts Audit
 Scans for configuration conflicts:
-- Contradictory instructions in CLAUDE.md
+- Contradictory instructions in project rules
 - Duplicate section definitions
 - Competing hook matchers across sources
 - Permission conflicts in settings files
