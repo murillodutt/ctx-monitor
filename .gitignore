@@ -20,7 +20,6 @@ Thumbs.db
 *.swo
 
 # Local development files (not part of plugin)
-CLAUDE.md
 plan.md
 *.plan.md
 
