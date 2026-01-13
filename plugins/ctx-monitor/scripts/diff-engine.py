@@ -11,8 +11,7 @@ import json
 import sys
 import argparse
 from pathlib import Path
-from datetime import datetime
-from typing import Dict, List, Any, Tuple, Optional
+from typing import Dict, List, Any
 from collections import defaultdict
 
 
@@ -170,7 +169,7 @@ def format_diff_text(diff: Dict[str, Any], session1_id: str, session2_id: str) -
     lines.append(f"\nComparing: {session1_id} -> {session2_id}")
 
     summary = diff.get("summary", {})
-    lines.append(f"\nSummary:")
+    lines.append("\nSummary:")
     lines.append(f"  - Added tools: {summary.get('added_count', 0)}")
     lines.append(f"  - Removed tools: {summary.get('removed_count', 0)}")
     lines.append(f"  - Changed tools: {summary.get('changed_count', 0)}")
@@ -181,17 +180,17 @@ def format_diff_text(diff: Dict[str, Any], session1_id: str, session2_id: str) -
         lines.append("\n  ⚠️  REGRESSIONS DETECTED")
 
     if diff.get("added_tools"):
-        lines.append(f"\n+ Added Tools:")
+        lines.append("\n+ Added Tools:")
         for tool in diff["added_tools"]:
             lines.append(f"    + {tool}")
 
     if diff.get("removed_tools"):
-        lines.append(f"\n- Removed Tools:")
+        lines.append("\n- Removed Tools:")
         for tool in diff["removed_tools"]:
             lines.append(f"    - {tool}")
 
     if diff.get("changed_tools"):
-        lines.append(f"\n~ Changed Tools:")
+        lines.append("\n~ Changed Tools:")
         for change in diff["changed_tools"]:
             tool = change["tool"]
             changes = change["changes"]
@@ -200,7 +199,7 @@ def format_diff_text(diff: Dict[str, Any], session1_id: str, session2_id: str) -
                 lines.append(f"        {key}: {val['from']} -> {val['to']}")
 
     if diff.get("error_changes"):
-        lines.append(f"\n! Error Changes:")
+        lines.append("\n! Error Changes:")
         for ec in diff["error_changes"]:
             if ec["type"] == "new_errors":
                 lines.append(f"    NEW ERRORS: {', '.join(ec['tools'])}")

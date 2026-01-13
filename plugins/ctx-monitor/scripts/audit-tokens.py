@@ -18,7 +18,7 @@ import argparse
 from datetime import datetime
 from pathlib import Path
 from collections import defaultdict
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List, Any
 
 
 # Approximate token estimation (chars / 4 is a rough estimate)

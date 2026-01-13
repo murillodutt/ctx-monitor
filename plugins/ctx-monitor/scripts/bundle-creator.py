@@ -112,7 +112,7 @@ def get_environment_info() -> Dict[str, Any]:
             if result.returncode == 0:
                 version = result.stdout.strip().split('\n')[0][:100]  # First line, max 100 chars
                 env_info["installed_tools"][tool] = version
-        except:
+        except (subprocess.SubprocessError, OSError):
             pass
 
     return env_info
@@ -152,7 +152,7 @@ def generate_report(traces_dir: Path, sessions: List[Dict[str, Any]]) -> str:
                             total_events += 1
                             if event.get("status") == "error":
                                 total_errors += 1
-            except:
+            except (json.JSONDecodeError, IOError):
                 pass
 
         error_rate = (total_errors / total_events * 100) if total_events > 0 else 0
@@ -209,7 +209,7 @@ def create_bundle(
                         (traces_bundle_dir / trace_file.name).write_text(result.stdout)
                     else:
                         shutil.copy(trace_file, traces_bundle_dir / trace_file.name)
-                except:
+                except (subprocess.SubprocessError, OSError):
                     shutil.copy(trace_file, traces_bundle_dir / trace_file.name)
             else:
                 shutil.copy(trace_file, traces_bundle_dir / trace_file.name)

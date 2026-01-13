@@ -20,7 +20,7 @@ import argparse
 from datetime import datetime
 from pathlib import Path
 from collections import defaultdict
-from typing import Dict, List, Any, Optional, Set
+from typing import Dict, List, Any, Set
 
 
 class ComplianceAuditor:

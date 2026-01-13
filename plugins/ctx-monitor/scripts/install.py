@@ -18,11 +18,10 @@ import argparse
 import json
 import os
 import shutil
-import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 # Import environment detector
 try:
@@ -173,7 +172,7 @@ class Installer:
 
             result.add_success("Directory structure created")
             result.add_info(f"  └─ {self.monitor_dir}")
-            result.add_info(f"     └─ traces/")
+            result.add_info("     └─ traces/")
             return True
 
         except PermissionError as e:
@@ -408,7 +407,7 @@ This file configures ctx-monitor behavior for this project.
 
         # Save environment config
         if self.env_detector.save_config(self.env_config_file):
-            result.add_success(f"Environment config saved")
+            result.add_success("Environment config saved")
         else:
             result.add_warning("Could not save environment config")
 
@@ -631,7 +630,7 @@ def print_result(result: InstallResult):
         print()
         print(f"  {Colors.info('Next steps:')}")
         print(f"    1. Run {Colors.CYAN}/ctx-monitor:start{Colors.RESET} to begin monitoring")
-        print(f"    2. Perform some operations")
+        print("    2. Perform some operations")
         print(f"    3. Run {Colors.CYAN}/ctx-monitor:dashboard{Colors.RESET} to view metrics")
     else:
         print(f"  {Colors.RED}{Colors.BOLD}Installation failed!{Colors.RESET}")

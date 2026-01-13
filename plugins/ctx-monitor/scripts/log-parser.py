@@ -12,7 +12,7 @@ import argparse
 from datetime import datetime
 from pathlib import Path
 from collections import defaultdict
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 
 
 def load_trace(file_path: str) -> List[Dict[str, Any]]:
@@ -75,7 +75,7 @@ def analyze_events(events: List[Dict[str, Any]]) -> Dict[str, Any]:
             start = datetime.fromisoformat(timestamps[0].replace('Z', '+00:00'))
             end = datetime.fromisoformat(timestamps[-1].replace('Z', '+00:00'))
             duration_seconds = (end - start).total_seconds()
-        except:
+        except (ValueError, TypeError):
             duration_seconds = None
     else:
         duration_seconds = None
@@ -104,11 +104,11 @@ def format_text(analysis: Dict[str, Any]) -> str:
     if analysis.get('duration_seconds'):
         lines.append(f"Duration: {analysis['duration_seconds']:.2f} seconds")
 
-    lines.append(f"\nEvent Types:")
+    lines.append("\nEvent Types:")
     for event_type, count in analysis.get('event_types', {}).items():
         lines.append(f"  - {event_type}: {count}")
 
-    lines.append(f"\nTool Calls:")
+    lines.append("\nTool Calls:")
     for tool, stats in analysis.get('tool_calls', {}).items():
         error_rate = (stats['errors'] / stats['count'] * 100) if stats['count'] > 0 else 0
         lines.append(f"  - {tool}: {stats['count']} calls ({error_rate:.1f}% errors)")

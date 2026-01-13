@@ -22,7 +22,6 @@ import json
 import sys
 import re
 import argparse
-from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Tuple
 import yaml
@@ -292,11 +291,11 @@ def format_status(status: Dict[str, Any]) -> str:
         lines.append(f"Current Session: {status['runtime_session']}")
 
     if status['validation_errors']:
-        lines.append(f"\n⚠️ Validation Errors:")
+        lines.append("\n⚠️ Validation Errors:")
         for error in status['validation_errors']:
             lines.append(f"  - {error}")
     else:
-        lines.append(f"\n✓ Configuration is valid")
+        lines.append("\n✓ Configuration is valid")
 
     lines.append("\n" + "=" * 50)
     return "\n".join(lines)

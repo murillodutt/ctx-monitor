@@ -18,13 +18,10 @@ Pages:
 
 import argparse
 import json
-import os
-import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from collections import defaultdict
-import math
 import statistics
 
 # =============================================================================
@@ -984,7 +981,7 @@ class MetricsCollector:
                         "type": "high_error_rate",
                         "message": f"Tool '{tool['tool']}' has {error_rate:.0f}% failure rate ({tool['errors']}/{tool['calls']} calls)",
                         "recommendation": recommendation,
-                        "action_command": f"/ctx-monitor:audit --type intermittency",
+                        "action_command": "/ctx-monitor:audit --type intermittency",
                         "related_events": related,
                         "first_occurrence": error_events[-1].get("timestamp", "")[-12:-5] if error_events else "",
                         "last_occurrence": error_events[0].get("timestamp", "")[-12:-5] if error_events else "",
@@ -998,7 +995,6 @@ class MetricsCollector:
         post_events = [e for e in self.events if e.get("event_type") == "PostToolUse"]
 
         # Find PreToolUse events without matching PostToolUse
-        post_ids = {e.get("event_id") for e in post_events}
         unpaired_events = []
         for pre in pre_events:
             # Simple heuristic: check if there's a PostToolUse with same tool shortly after
@@ -1133,7 +1129,6 @@ class OverviewPage:
         event_sparkline = self._generate_event_sparkline()
         error_sparkline = self._generate_error_sparkline()
 
-        card_width = (self.width - 4) // 3
 
         # Colorized health display
         health_display = Colors.c(f"{health_indicator} {health}%", health_color)
@@ -1215,7 +1210,7 @@ class OverviewPage:
         lines.append("")
 
         # Footer
-        lines.append(f" [1] Overview  [2] Stack  [3] Tools  [4] Timeline  [5] Alerts   Page 1/5")
+        lines.append(" [1] Overview  [2] Stack  [3] Tools  [4] Timeline  [5] Alerts   Page 1/5")
 
         return "\n".join(lines)
 
@@ -1285,7 +1280,7 @@ class StackPage:
 
         # Header
         header = Box.draw("", [
-            f"  CONTEXT ENGINEERING STACK                                    Page 2/5       ",
+            "  CONTEXT ENGINEERING STACK                                    Page 2/5       ",
         ], self.width)
         lines.extend(header)
         lines.append("")
@@ -1382,7 +1377,7 @@ class StackPage:
         lines.append("")
 
         # Footer
-        lines.append(f" [1] Overview  [2] Stack  [3] Tools  [4] Timeline  [5] Alerts   Page 2/5")
+        lines.append(" [1] Overview  [2] Stack  [3] Tools  [4] Timeline  [5] Alerts   Page 2/5")
 
         return "\n".join(lines)
 
@@ -1400,7 +1395,7 @@ class ToolsPage:
 
         # Header
         header = Box.draw("", [
-            f"  TOOL PERFORMANCE                                             Page 3/5       ",
+            "  TOOL PERFORMANCE                                             Page 3/5       ",
         ], self.width)
         lines.extend(header)
         lines.append("")
@@ -1480,7 +1475,7 @@ class ToolsPage:
         lines.append("")
 
         # Footer
-        lines.append(f" [1] Overview  [2] Stack  [3] Tools  [4] Timeline  [5] Alerts   Page 3/5")
+        lines.append(" [1] Overview  [2] Stack  [3] Tools  [4] Timeline  [5] Alerts   Page 3/5")
 
         return "\n".join(lines)
 
@@ -1498,7 +1493,7 @@ class TimelinePage:
 
         # Header
         header = Box.draw("", [
-            f"  ACTIVITY TIMELINE                                            Page 4/5       ",
+            "  ACTIVITY TIMELINE                                            Page 4/5       ",
         ], self.width)
         lines.extend(header)
         lines.append("")
@@ -1544,7 +1539,7 @@ class TimelinePage:
         lines.append("")
 
         # Footer
-        lines.append(f" [1] Overview  [2] Stack  [3] Tools  [4] Timeline  [5] Alerts   Page 4/5")
+        lines.append(" [1] Overview  [2] Stack  [3] Tools  [4] Timeline  [5] Alerts   Page 4/5")
 
         return "\n".join(lines)
 
@@ -1562,7 +1557,7 @@ class AlertsPage:
 
         # Header
         header = Box.draw("", [
-            f"  ALERTS & RECOMMENDATIONS                                     Page 5/5       ",
+            "  ALERTS & RECOMMENDATIONS                                     Page 5/5       ",
         ], self.width)
         lines.extend(header)
         lines.append("")
@@ -1630,7 +1625,7 @@ class AlertsPage:
         lines.append("")
 
         # Footer
-        lines.append(f" [1] Overview  [2] Stack  [3] Tools  [4] Timeline  [5] Alerts   Page 5/5")
+        lines.append(" [1] Overview  [2] Stack  [3] Tools  [4] Timeline  [5] Alerts   Page 5/5")
 
         return "\n".join(lines)
 

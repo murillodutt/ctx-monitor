@@ -16,9 +16,7 @@ Features:
 """
 
 import argparse
-import asyncio
 import json
-import os
 import signal
 import sys
 import threading
@@ -26,9 +24,8 @@ import webbrowser
 from datetime import datetime
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 from urllib.parse import parse_qs, urlparse
-import hashlib
 
 # Import existing analysis modules
 sys.path.insert(0, str(Path(__file__).parent))
@@ -2518,12 +2515,12 @@ def run_server(project_dir: str, port: int = DEFAULT_PORT, no_open: bool = False
     signal.signal(signal.SIGTERM, shutdown)
 
     url = f"http://localhost:{port}"
-    print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print(f"  ctx-monitor Dashboard")
+    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    print("  ctx-monitor Dashboard")
     print(f"  {url}")
-    print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print(f"  Press Ctrl+C to stop")
-    print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    print("  Press Ctrl+C to stop")
+    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
     # Open browser
     if not no_open:

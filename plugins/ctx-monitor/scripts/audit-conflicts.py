@@ -355,7 +355,7 @@ def format_markdown(result: Dict[str, Any]) -> str:
             if issue.get("line"):
                 lines.append(f"**Line:** {issue.get('line')}")
             if issue.get("locations"):
-                lines.append(f"**Locations:**")
+                lines.append("**Locations:**")
                 for loc in issue.get("locations", []):
                     lines.append(f"- `{loc}`")
             lines.append(f"\n**Remediation:** {issue.get('remediation')}\n")
