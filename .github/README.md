@@ -35,7 +35,7 @@ curl -sSL https://raw.githubusercontent.com/murillodutt/ctx-monitor/main/plugins
    ```
    https://raw.githubusercontent.com/murillodutt/ctx-monitor/refs/heads/main/.claude-plugin/marketplace.json
    ```
-4. Install the plugin:
+#### Install the plugin:
    ## Project scope - available only in current project
    ```bash
    /plugin install ctx-monitor@dutt-plugins-official --scope project
