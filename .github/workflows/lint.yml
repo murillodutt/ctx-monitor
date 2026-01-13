@@ -34,7 +34,7 @@ jobs:
       - name: Check Clean Root
         run: |
           # List of allowed files in root
-          ALLOWED_FILES=".gitignore CLAUDE.md plugins docs .github .claude-plugin .cursor"
+          ALLOWED_FILES=".git .gitignore CLAUDE.md plugins docs .github .claude-plugin .cursor"
           ROOT_FILES=$(ls -A)
           
           for file in $ROOT_FILES; do
