@@ -47,7 +47,7 @@ mkdir -p "$MARKETPLACE_DIR/plugins"
 # Step 2: Clone/update repository
 step "Downloading plugin from GitHub..."
 TEMP_DIR=$(mktemp -d)
-trap "rm -rf $TEMP_DIR" EXIT
+trap 'rm -rf "$TEMP_DIR"' EXIT
 
 git clone --depth 1 "https://github.com/$REPO.git" "$TEMP_DIR" 2>/dev/null || error "Failed to clone repository"
 
