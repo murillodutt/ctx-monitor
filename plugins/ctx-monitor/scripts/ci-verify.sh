@@ -8,7 +8,6 @@ echo "===================================================="
 echo "CTX-MONITOR CI VERIFICATION"
 echo "===================================================="
 
-PROJECT_ROOT=$(pwd)
 PLUGIN_DIR="plugins/ctx-monitor"
 
 # 1. Check Directory Structure

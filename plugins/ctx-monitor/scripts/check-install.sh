@@ -7,7 +7,6 @@
 
 PROJECT_DIR="${1:-.}"
 MONITOR_DIR="${PROJECT_DIR}/.claude/ctx-monitor"
-STATUS_FILE="${MONITOR_DIR}/.installed"
 
 # Check if ctx-monitor directory exists
 if [ ! -d "$MONITOR_DIR" ]; then
