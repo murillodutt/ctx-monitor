@@ -28,12 +28,23 @@ curl -sSL https://raw.githubusercontent.com/murillodutt/ctx-monitor/main/plugins
 ```
 
 #### Via Marketplace (Recommended)
-```bash
-/plugin add murillodutt/ctx-monitor
-/plugin install ctx-monitor@dutt-plugins-official
-```
 
-*Note: Also available via [dutt-plugins-official marketplace](https://github.com/murillodutt/ctx-monitor).*
+1. Run `/plugin` in Claude Code
+2. Select **Manage marketplaces** > **Add Marketplace**
+3. Enter the marketplace source:
+   ```
+   https://raw.githubusercontent.com/murillodutt/ctx-monitor/refs/heads/main/.claude-plugin/marketplace.json
+   ```
+4. Install the plugin:
+   ## Project scope - available only in current project
+   ```bash
+   /plugin install ctx-monitor@dutt-plugins-official --scope project
+   ```
+
+   ## Global scope - available in all projects
+   ```bash
+   /plugin install ctx-monitor@dutt-plugins-official --scope global
+   ```
 
 ### 2. Initial Setup
 

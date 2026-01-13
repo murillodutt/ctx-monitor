@@ -101,10 +101,33 @@ anonymize_on_export: true
 
 ## Installation
 
-This plugin is available via the dutt-plugins-official marketplace.
+### Option 1: Quick Install (curl)
 
 ```bash
-/plugin install ctx-monitor@dutt-plugins-official
+curl -sSL https://raw.githubusercontent.com/murillodutt/ctx-monitor/main/plugins/ctx-monitor/scripts/install.sh | bash
+```
+
+### Option 2: Via Marketplace
+
+1. Open Claude Code and run `/plugin`
+2. Select **Manage marketplaces** > **Add Marketplace**
+3. Enter the marketplace source:
+   ```
+   https://raw.githubusercontent.com/murillodutt/ctx-monitor/refs/heads/main/.claude-plugin/marketplace.json
+   ```
+4. Install the plugin:
+   ```bash
+   # Project scope - available only in current project
+   /plugin install ctx-monitor@dutt-plugins-official --scope project
+
+   # Global scope - available in all projects
+   /plugin install ctx-monitor@dutt-plugins-official --scope global
+   ```
+
+### Option 3: Local Development
+
+```bash
+claude --plugin-dir ./plugins/ctx-monitor
 ```
 
 ## Requirements
