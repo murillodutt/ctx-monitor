@@ -53,7 +53,7 @@ fi
 
 # 4. Check Root Cleanliness (Same logic as CI workflow)
 echo "[4/4] Verifying root cleanliness..."
-ALLOWED_FILES=".git .ruff_cache .gitignore CLAUDE.md plugins docs .github .claude-plugin .cursor"
+ALLOWED_FILES="LICENSE .git .ruff_cache .gitignore CLAUDE.md plugins docs .github .claude-plugin .cursor"
 ROOT_FILES=$(ls -A)
 
 for file in $ROOT_FILES; do
