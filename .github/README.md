@@ -22,20 +22,21 @@
 
 ### 1. Installation
 
-#### Quick Install (curl)
-```bash
-curl -sSL https://raw.githubusercontent.com/murillodutt/ctx-monitor/main/plugins/ctx-monitor/scripts/install.sh | bash
-```
+   #### Quick Install (curl)
+   ```bash
+   curl -sSL https://raw.githubusercontent.com/murillodutt/ctx-monitor/main/plugins/ctx-monitor/scripts/install.sh | bash
+   ```
 
-#### Via Marketplace (Recommended)
+   #### Via Marketplace (Recommended)
 
-1. Run `/plugin` in Claude Code
-2. Select **Manage marketplaces** > **Add Marketplace**
-3. Enter the marketplace source:
+   1. Run `/plugin` in Claude Code
+   2. Select **Manage marketplaces** > **Add Marketplace**
+   3. Enter the marketplace source:
    ```
    https://raw.githubusercontent.com/murillodutt/ctx-monitor/refs/heads/main/.claude-plugin/marketplace.json
    ```
-#### Install the plugin:
+
+   #### Install the plugin:
 
    ##### Project scope - available only in current project
    ```bash
