@@ -14,9 +14,15 @@ hook_event=$(echo "$input" | jq -r '.hook_event_name // "unknown"')
 cwd=$(echo "$input" | jq -r '.cwd // "."')
 
 # ============================================
-# Per-project configuration check
+# Per-project configuration check (OPT-IN MODEL)
 # ============================================
+# Monitoring only runs if explicitly started with /start command.
+# The /start command creates config.json with enabled: true.
+# The /stop command sets enabled: false.
+# User can permanently disable via .local.md enabled: false.
+
 config_file="${cwd}/.claude/ctx-monitor.local.md"
+runtime_config="${cwd}/.claude/ctx-monitor/config.json"
 
 # Function to extract YAML value from frontmatter
 get_config_value() {
@@ -33,22 +39,24 @@ get_config_value() {
   echo "$default"
 }
 
-# Check if ctx-monitor is enabled for this project
-# First check runtime config.json (set by /stop command)
-runtime_config="${cwd}/.claude/ctx-monitor/config.json"
-if [ -f "$runtime_config" ]; then
-  # Use 'if .enabled == false' to properly detect false value (not just falsy)
-  runtime_enabled=$(jq -r 'if .enabled == false then "false" else "true" end' "$runtime_config" 2>/dev/null)
-  if [ "$runtime_enabled" = "false" ]; then
-    # Monitoring was stopped via /stop command
-    exit 0
-  fi
+# Step 1: Check if project permanently disabled monitoring via .local.md
+local_enabled=$(get_config_value "enabled" "true")
+if [ "$local_enabled" = "false" ]; then
+  # ctx-monitor is permanently disabled for this project
+  exit 0
 fi
 
-# Then check user config in .local.md
-enabled=$(get_config_value "enabled" "true")
-if [ "$enabled" = "false" ]; then
-  # ctx-monitor is disabled for this project, exit silently
+# Step 2: Check runtime config.json - MUST exist AND have enabled: true
+# This is the OPT-IN check: monitoring only runs after /start command
+if [ ! -f "$runtime_config" ]; then
+  # No config.json = monitoring was never started, exit silently
+  exit 0
+fi
+
+# Check if monitoring is explicitly enabled (set by /start command)
+runtime_enabled=$(jq -r '.enabled // false' "$runtime_config" 2>/dev/null)
+if [ "$runtime_enabled" != "true" ]; then
+  # Monitoring not active (either stopped or never properly started)
   exit 0
 fi
 

@@ -2,7 +2,14 @@
 # ctx-monitor per-project configuration
 # Copy this file to your project: .claude/ctx-monitor.local.md
 
+# NOTE: ctx-monitor uses an OPT-IN model.
+# Monitoring only starts when you run /ctx-monitor:start
+# This file configures behavior WHEN monitoring is active.
+
+# Set to false to permanently disable ctx-monitor for this project
+# (even /start won't work when this is false)
 enabled: true
+
 log_level: medium  # minimal | medium | full
 
 # Event filtering (capture only these events)
@@ -43,15 +50,24 @@ exclude_patterns: []
 
 This file configures ctx-monitor behavior for this project.
 
+## How Monitoring Works (OPT-IN Model)
+
+ctx-monitor does NOT monitor automatically. You must explicitly start it:
+
+1. Run `/ctx-monitor:start` to begin monitoring
+2. Run `/ctx-monitor:stop` to stop monitoring
+3. Monitoring state persists until you stop it or close the session
+
 ## Log Levels
 
 - **minimal**: Only session lifecycle events (SessionStart, SessionEnd, Stop)
 - **medium**: All events with truncated payloads (500 chars) - Default
 - **full**: Complete event capture with full tool inputs/outputs
 
-## Enabling/Disabling
+## Permanently Disabling
 
-Set `enabled: false` to disable ctx-monitor for this project without uninstalling.
+Set `enabled: false` to permanently disable ctx-monitor for this project.
+When disabled, even `/ctx-monitor:start` won't activate monitoring.
 
 ## Event Filtering
 

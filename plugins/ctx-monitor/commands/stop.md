@@ -55,3 +55,5 @@ Stop event logging for the current session. Optionally preserve or clean up logs
 
 - Logs are always preserved by default for later analysis
 - Use `/ctx-monitor:report` to analyze captured events
+- After stopping, new sessions won't monitor until you run `/start` again
+- Use `/ctx-monitor:config clear` to remove inactive session logs

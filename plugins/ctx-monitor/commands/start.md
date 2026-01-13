@@ -9,7 +9,7 @@ allowed-tools:
 
 # Start Context Monitor
 
-Start event logging for the current Claude Code session. Creates trace directory and enables hooks.
+Start event logging for the current Claude Code session. This command activates the monitoring hooks - without running `/start`, no events are captured (opt-in model).
 
 ## Instructions
 
@@ -55,6 +55,8 @@ Start event logging for the current Claude Code session. Creates trace directory
 
 ## Notes
 
+- **OPT-IN Model**: Monitoring only starts when you explicitly run this command
 - Monitoring persists across tool calls within the session
 - Use `/ctx-monitor:stop` to stop monitoring
 - Traces are stored in `.claude/ctx-monitor/traces/`
+- Starting a new session requires running `/start` again
