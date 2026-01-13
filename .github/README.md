@@ -83,7 +83,7 @@ This is an open-source project maintained by **Dutt Yeshua Technology Ltd**. We 
 
 ## License
 
-MIT - [Murillo Dutt](https://github.com/murillodutt/) / [Dutt Yeshua Technology Ltd](https://duttyeshua.com)
+MIT - [Murillo Dutt](https://github.com/murillodutt/) / [Dutt Yeshua Technology Ltd](https://github.com/murillodutt)
 
 ---
 

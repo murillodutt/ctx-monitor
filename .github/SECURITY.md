@@ -3,7 +3,7 @@
 ## Reporting a Vulnerability
 The security of **ctx-monitor** and our users' data is our priority. If you discover a security vulnerability, please do not open a public Issue.
 
-Instead, please send an email to: **security@duttyeshua.com**
+Instead, please send an email to: **security@github.com/murillodutt**
 
 Our team will review the report and respond as quickly as possible.
 

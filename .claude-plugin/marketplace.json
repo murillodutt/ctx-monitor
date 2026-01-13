@@ -4,7 +4,7 @@
   "description": "Official Dutt Yeshua Technology plugins marketplace",
   "owner": {
     "name": "Murillo Dutt",
-    "email": "murillo@duttyeshua.com"
+    "email": "murillo@github.com/murillodutt"
   },
   "plugins": [
     {
@@ -13,7 +13,7 @@
       "version": "0.3.6",
       "author": {
         "name": "Murillo Dutt",
-        "email": "murillo@duttyeshua.com"
+        "email": "murillo@github.com/murillodutt"
       },
       "source": "./plugins/ctx-monitor",
       "category": "development"

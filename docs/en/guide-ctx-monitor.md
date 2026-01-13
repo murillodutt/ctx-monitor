@@ -1616,7 +1616,7 @@ ls .claude/ctx-monitor/traces/
 
 **Contact**:
 - Author: Murillo Dutt
-- Email: murillo@duttyeshua.com
+- Email: murillo@github.com/murillodutt
 - Organization: Dutt Yeshua Technology Ltd
 
 ---
