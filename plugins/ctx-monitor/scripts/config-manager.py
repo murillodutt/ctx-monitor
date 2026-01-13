@@ -272,6 +272,93 @@ Edit the YAML frontmatter above to customize settings.
                 "include_args": True
             }
 
+    def clear_inactive_logs(self, keep_active: bool = True) -> Dict[str, Any]:
+        """
+        Clear inactive session logs.
+
+        Args:
+            keep_active: If True, keeps the currently active session (if any).
+
+        Returns:
+            Dict with cleared files count and freed space.
+        """
+        traces_dir = self.config_dir / "ctx-monitor" / "traces"
+        if not traces_dir.exists():
+            return {"cleared": 0, "freed_bytes": 0, "kept": 0, "files": []}
+
+        # Get active session ID from runtime config
+        active_session = None
+        if keep_active and self.runtime_config.exists():
+            try:
+                runtime = json.loads(self.runtime_config.read_text())
+                if runtime.get("enabled", False):
+                    active_session = runtime.get("session_id")
+            except json.JSONDecodeError:
+                pass
+
+        cleared_files = []
+        kept_files = []
+        freed_bytes = 0
+
+        # Find all session files
+        for trace_file in traces_dir.glob("session_*.jsonl"):
+            session_id = trace_file.stem.replace("session_", "")
+
+            # Skip active session
+            if active_session and session_id == active_session:
+                kept_files.append(trace_file.name)
+                continue
+
+            # Check if session has ended (has SessionEnd event)
+            is_ended = False
+            try:
+                with open(trace_file, "r") as f:
+                    for line in f:
+                        try:
+                            event = json.loads(line)
+                            if event.get("event_type") == "SessionEnd":
+                                is_ended = True
+                                break
+                        except json.JSONDecodeError:
+                            continue
+            except IOError:
+                continue
+
+            # Only clear ended sessions
+            if is_ended:
+                file_size = trace_file.stat().st_size
+                trace_file.unlink()
+                cleared_files.append(trace_file.name)
+                freed_bytes += file_size
+            else:
+                kept_files.append(trace_file.name)
+
+        # Update sessions.json index
+        sessions_index = traces_dir / "sessions.json"
+        if sessions_index.exists() and cleared_files:
+            try:
+                with open(sessions_index, "r") as f:
+                    index_data = json.load(f)
+
+                # Remove cleared sessions from index
+                cleared_ids = {f.replace("session_", "").replace(".jsonl", "") for f in cleared_files}
+                index_data["sessions"] = [
+                    s for s in index_data.get("sessions", [])
+                    if s.get("session_id") not in cleared_ids
+                ]
+
+                with open(sessions_index, "w") as f:
+                    json.dump(index_data, f, indent=2)
+            except (json.JSONDecodeError, IOError):
+                pass
+
+        return {
+            "cleared": len(cleared_files),
+            "freed_bytes": freed_bytes,
+            "kept": len(kept_files),
+            "files": cleared_files
+        }
+
 
 def format_status(status: Dict[str, Any]) -> str:
     """Format status as human-readable text."""
@@ -301,10 +388,39 @@ def format_status(status: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def format_clear_result(result: Dict[str, Any]) -> str:
+    """Format clear result as human-readable text."""
+    lines = []
+    lines.append("=" * 50)
+    lines.append("CTX-MONITOR CLEAR INACTIVE LOGS")
+    lines.append("=" * 50)
+
+    if result["cleared"] == 0:
+        lines.append("\nNo inactive sessions to clear.")
+        lines.append(f"Sessions kept: {result['kept']}")
+    else:
+        freed_kb = result["freed_bytes"] / 1024
+        freed_str = f"{freed_kb:.1f} KB" if freed_kb < 1024 else f"{freed_kb/1024:.2f} MB"
+
+        lines.append(f"\n✓ Cleared {result['cleared']} inactive session(s)")
+        lines.append(f"  Freed: {freed_str}")
+        lines.append(f"  Kept: {result['kept']} session(s)")
+
+        if result["files"]:
+            lines.append("\nCleared files:")
+            for f in result["files"][:10]:  # Show max 10
+                lines.append(f"  - {f}")
+            if len(result["files"]) > 10:
+                lines.append(f"  ... and {len(result['files']) - 10} more")
+
+    lines.append("\n" + "=" * 50)
+    return "\n".join(lines)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Manage ctx-monitor per-project configuration")
     parser.add_argument("project_dir", help="Path to project directory")
-    parser.add_argument("action", choices=["status", "init", "enable", "disable", "get", "set", "validate", "check-event"],
+    parser.add_argument("action", choices=["status", "init", "enable", "disable", "get", "set", "validate", "check-event", "clear"],
                         help="Action to perform")
     parser.add_argument("--key", help="Configuration key (for get/set)")
     parser.add_argument("--value", help="Configuration value (for set)")
@@ -385,6 +501,13 @@ def main():
         else:
             print(f"Log {args.event}: {'✓ Yes' if should_log else '✗ No'}")
         sys.exit(0 if should_log else 1)
+
+    elif args.action == "clear":
+        result = manager.clear_inactive_logs(keep_active=True)
+        if args.format == "json":
+            print(json.dumps(result, indent=2))
+        else:
+            print(format_clear_result(result))
 
 
 if __name__ == "__main__":

@@ -34,6 +34,18 @@ get_config_value() {
 }
 
 # Check if ctx-monitor is enabled for this project
+# First check runtime config.json (set by /stop command)
+runtime_config="${cwd}/.claude/ctx-monitor/config.json"
+if [ -f "$runtime_config" ]; then
+  # Use 'if .enabled == false' to properly detect false value (not just falsy)
+  runtime_enabled=$(jq -r 'if .enabled == false then "false" else "true" end' "$runtime_config" 2>/dev/null)
+  if [ "$runtime_enabled" = "false" ]; then
+    # Monitoring was stopped via /stop command
+    exit 0
+  fi
+fi
+
+# Then check user config in .local.md
 enabled=$(get_config_value "enabled" "true")
 if [ "$enabled" = "false" ]; then
   # ctx-monitor is disabled for this project, exit silently

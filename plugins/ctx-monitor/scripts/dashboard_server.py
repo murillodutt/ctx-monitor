@@ -80,6 +80,18 @@ class DashboardAPI:
         except (json.JSONDecodeError, IOError):
             return {"sessions": [], "count": 0}
 
+    def _is_monitoring_enabled(self) -> bool:
+        """Check if monitoring is enabled in config.json."""
+        config_file = self.traces_dir.parent / "config.json"
+        if not config_file.exists():
+            return False
+        try:
+            with open(config_file) as f:
+                config = json.load(f)
+                return config.get("enabled", False)
+        except (json.JSONDecodeError, IOError):
+            return False
+
     def get_overview(self, session_id: Optional[str] = None) -> Dict[str, Any]:
         """Get overview metrics."""
         metrics = self._get_metrics(session_id)
@@ -89,6 +101,7 @@ class DashboardAPI:
         health = metrics.calculate_health_score()
         stats = metrics.compute_statistics()
         stack_summary = stack.get_stack_summary(metrics.events)
+        is_monitoring = self._is_monitoring_enabled()
 
         # Calculate token breakdown
         total_stack_tokens = stack_summary["total_tokens"]
@@ -102,7 +115,8 @@ class DashboardAPI:
                 "project": session_info["project"],
                 "started_at": session_info["started_at"].isoformat() if session_info["started_at"] else None,
                 "duration": session_info["duration"],
-                "event_count": session_info["event_count"]
+                "event_count": session_info["event_count"],
+                "is_active": is_monitoring
             },
             "health": {
                 "score": health,
@@ -687,12 +701,21 @@ def get_embedded_frontend() -> str:
             letter-spacing: 0.5px;
         }
 
+        .live-indicator.offline {
+            color: var(--error);
+        }
+
         .live-dot {
             width: 8px;
             height: 8px;
             background: var(--success);
             border-radius: 50%;
             animation: pulse 2s infinite;
+        }
+
+        .live-indicator.offline .live-dot {
+            background: var(--error);
+            animation: none;
         }
 
         @keyframes pulse {
@@ -2421,9 +2444,9 @@ def get_embedded_frontend() -> str:
                         </nav>
 
                         <div className="header-actions">
-                            <div className="live-indicator">
+                            <div className={`live-indicator ${data?.session?.is_active ? '' : 'offline'}`}>
                                 <div className="live-dot" />
-                                Live
+                                {data?.session?.is_active ? 'Live' : 'Offline'}
                             </div>
                             <button
                                 className="theme-toggle"

@@ -776,13 +776,18 @@ class MetricsCollector:
         ended_at = max(timestamps) if timestamps else None
         duration = (ended_at - started_at).total_seconds() if started_at and ended_at else 0
 
+        # Check if session is still active (no SessionEnd event)
+        event_types = {e.get("event_type") for e in self.events}
+        is_active = "SessionEnd" not in event_types
+
         return {
             "session_id": self.session_id,
             "started_at": started_at,
             "ended_at": ended_at,
             "duration": duration,
             "event_count": len(self.events),
-            "project": self.project_dir.name
+            "project": self.project_dir.name,
+            "is_active": is_active
         }
 
     def get_tool_metrics(self) -> List[Dict[str, Any]]:

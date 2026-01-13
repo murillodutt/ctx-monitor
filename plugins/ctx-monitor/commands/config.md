@@ -1,6 +1,6 @@
 ---
 description: Manage ctx-monitor per-project configuration
-argument-hint: "[init|status|enable|disable|set <key> <value>]"
+argument-hint: "[init|status|enable|disable|set <key> <value>|clear]"
 allowed-tools:
   - Bash
   - Read
@@ -19,6 +19,7 @@ Configure ctx-monitor behavior for the current project.
    - `enable`: Enable ctx-monitor for this project
    - `disable`: Disable ctx-monitor for this project
    - `set <key> <value>`: Set a configuration value
+   - `clear`: Delete all inactive session logs (keeps active session)
 
 2. Run the config-manager script:
 
@@ -35,6 +36,9 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/config-manager.py "$(pwd)" disable
 
 # Set value
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/config-manager.py "$(pwd)" set --key log_level --value minimal
+
+# Clear inactive logs
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/config-manager.py "$(pwd)" clear
 ```
 
 ## Configuration File
@@ -102,6 +106,9 @@ anonymize_on_export: true
 
 # Set retention period
 /ctx-monitor:config set retention_days 7
+
+# Clear inactive session logs
+/ctx-monitor:config clear
 ```
 
 ## File Location
