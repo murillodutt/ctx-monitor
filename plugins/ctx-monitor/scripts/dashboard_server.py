@@ -2450,7 +2450,7 @@ def get_embedded_frontend() -> str:
                     </main>
 
                     <footer className="footer">
-                        ctx-monitor v0.3.5 • Context Oracle
+                        ctx-monitor v0.3.6 • Context Oracle
                     </footer>
                 </div>
             );

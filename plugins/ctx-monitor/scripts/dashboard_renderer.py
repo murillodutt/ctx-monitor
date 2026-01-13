@@ -927,9 +927,18 @@ class MetricsCollector:
 
         return errors[:10]  # Limit to 10 most recent
 
+    def _generate_stable_alert_id(self, alert_type: str, identifier: str) -> str:
+        """Generate a stable ID for an alert based on its type and identifier.
+
+        This ensures the same alert always gets the same ID across requests,
+        which is required for UI state persistence (e.g., expanded/collapsed).
+        """
+        import hashlib
+        content = f"{alert_type}:{identifier}"
+        return hashlib.md5(content.encode()).hexdigest()[:8]
+
     def get_alerts(self) -> List[Dict[str, Any]]:
         """Generate alerts based on metrics analysis with full context."""
-        import uuid
         alerts = []
         tool_metrics = self.get_tool_metrics()
 
@@ -954,7 +963,7 @@ class MetricsCollector:
                             "timestamp": ev.get("timestamp", "")[-12:-5] if ev.get("timestamp") else "",
                             "event_type": ev.get("event_type", ""),
                             "tool_name": ev.get("tool_name", ""),
-                            "args_preview": (ev.get("args_preview", "") or "")[:50],
+                            "args_preview": (ev.get("args_preview", "") or "")[:200],
                             "error_message": (ev.get("error_message", "") or ev.get("result_preview", "") or "")[:100]
                         })
 
@@ -970,7 +979,7 @@ class MetricsCollector:
                         recommendation = "Moderate failure rate. Monitor for patterns."
 
                     alerts.append({
-                        "id": str(uuid.uuid4())[:8],
+                        "id": self._generate_stable_alert_id("high_error_rate", tool["tool"]),
                         "severity": severity,
                         "type": "high_error_rate",
                         "message": f"Tool '{tool['tool']}' has {error_rate:.0f}% failure rate ({tool['errors']}/{tool['calls']} calls)",
@@ -1014,12 +1023,12 @@ class MetricsCollector:
                     "timestamp": ev.get("timestamp", "")[-12:-5] if ev.get("timestamp") else "",
                     "event_type": ev.get("event_type", ""),
                     "tool_name": ev.get("tool_name", ""),
-                    "args_preview": (ev.get("args_preview", "") or "")[:50],
+                    "args_preview": (ev.get("args_preview", "") or "")[:200],
                     "error_message": ""
                 })
 
             alerts.append({
-                "id": str(uuid.uuid4())[:8],
+                "id": self._generate_stable_alert_id("unpaired_events", "pretooluse"),
                 "severity": "HIGH" if unpaired > 5 else "MEDIUM",
                 "type": "unpaired_events",
                 "message": f"{unpaired} PreToolUse events without matching PostToolUse",

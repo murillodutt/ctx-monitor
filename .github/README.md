@@ -1,6 +1,8 @@
+![Image](https://github.com/user-attachments/assets/aec1631d-94bf-45a6-934a-215113d327be)
+
 # ctx-monitor (Context Oracle)
 
-[![Version](https://img.shields.io/badge/version-0.3.5-green.svg)](https://github.com/murillodutt/ctx-monitor/releases)
+[![Version](https://img.shields.io/badge/version-0.3.6-green.svg)](https://github.com/murillodutt/ctx-monitor/releases)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](.github/LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://claude.ai/code)
 

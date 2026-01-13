@@ -42,6 +42,13 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/install.py" "$(pwd)" repair
 
 The doctor command performs the following diagnostics and fixes:
 
+### 0. Environment Detection (NEW)
+- Auto-detects operating system (macOS, Windows, Linux)
+- Finds correct Python command (python3, python, py)
+- Identifies shell environment
+- Saves environment config to environment.json
+- Ensures cross-platform compatibility
+
 ### 1. Cache Cleanup
 - Detects orphaned plugin cache references
 - Removes corrupted/empty cache directories
@@ -126,3 +133,5 @@ The doctor command performs the following diagnostics and fixes:
 | Missing script permissions | chmod +x on .sh files |
 | Missing directories | Creates required structure |
 | Missing config file | Creates default config |
+| Wrong Python command | Detects correct python/python3 |
+| Unknown OS environment | Auto-detects and saves config |

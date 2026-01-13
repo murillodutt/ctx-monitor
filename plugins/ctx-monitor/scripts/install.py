@@ -24,6 +24,20 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+# Import environment detector
+try:
+    from env_detector import EnvironmentDetector
+except ImportError:
+    # Fallback if running from different directory
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "env_detector",
+        Path(__file__).parent / "env_detector.py"
+    )
+    env_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(env_module)
+    EnvironmentDetector = env_module.EnvironmentDetector
+
 # Minimum Python version
 MIN_PYTHON = (3, 7)
 
@@ -99,6 +113,8 @@ class Installer:
         self.traces_dir = self.monitor_dir / "traces"
         self.config_file = self.claude_dir / "ctx-monitor.local.md"
         self.status_file = self.monitor_dir / ".installed"
+        self.env_config_file = self.monitor_dir / "environment.json"
+        self.env_detector = EnvironmentDetector()
 
     def _find_plugin_dir(self) -> Optional[Path]:
         """Find the ctx-monitor plugin directory."""
@@ -270,7 +286,7 @@ This file configures ctx-monitor behavior for this project.
         try:
             status = {
                 "installed_at": datetime.now().isoformat(),
-                "version": "0.3.5",
+                "version": "0.3.6",
                 "plugin_dir": str(self.plugin_dir) if self.plugin_dir else None,
                 "project_dir": str(self.project_dir)
             }
@@ -382,6 +398,19 @@ This file configures ctx-monitor behavior for this project.
 
         problems_found = 0
         problems_fixed = 0
+
+        # Check 0: Environment detection
+        print(Colors.step("Detecting environment..."))
+        env_info = self.env_detector.get_env_info()
+        result.add_success(f"OS: {env_info['os_name']} ({env_info['architecture']})")
+        result.add_success(f"Python: {env_info['python_cmd']} v{env_info['python_version']}")
+        result.add_info(f"Shell: {env_info['shell']}")
+
+        # Save environment config
+        if self.env_detector.save_config(self.env_config_file):
+            result.add_success(f"Environment config saved")
+        else:
+            result.add_warning("Could not save environment config")
 
         # Check 1: Orphaned cache references
         print(Colors.step("Checking for orphaned cache references..."))

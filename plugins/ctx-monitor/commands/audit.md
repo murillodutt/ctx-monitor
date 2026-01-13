@@ -30,10 +30,10 @@ Perform modular audits on trace data to detect issues, inefficiencies, and compl
 
 ```bash
 # Run all audits
-python ${CLAUDE_PLUGIN_ROOT}/scripts/audit-runner.py "$(pwd)" --type all --format md
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/audit-runner.py "$(pwd)" --type all --format md
 
 # Run specific audit type
-python ${CLAUDE_PLUGIN_ROOT}/scripts/audit-runner.py "$(pwd)" --type intermittency --format md
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/audit-runner.py "$(pwd)" --type intermittency --format md
 ```
 
 3. The audit scripts are located in `${CLAUDE_PLUGIN_ROOT}/scripts/`:
