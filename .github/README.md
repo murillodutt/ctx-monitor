@@ -84,10 +84,10 @@ anonymize_on_export: true
 
 This is an open-source project maintained by **Dutt Yeshua Technology Ltd**. We value transparency and technical collaboration.
 
-- **[Roadmap](.github/ROADMAP.md)**: Future vision and planned features.
-- **[Governance](.github/GOVERNANCE.md)**: How technical priorities are defined via demand and voting.
-- **[Contributing](.github/CONTRIBUTING.md)**: Development guide and code standards.
-- **[Security](.github/SECURITY.md)**: Secure vulnerability reporting policy.
+- **[Roadmap](ROADMAP.md)**: Future vision and planned features.
+- **[Governance](GOVERNANCE.md)**: How technical priorities are defined via demand and voting.
+- **[Contributing](CONTRIBUTING.md)**: Development guide and code standards.
+- **[Security](SECURITY.md)**: Secure vulnerability reporting policy.
 
 ## Requirements
 
